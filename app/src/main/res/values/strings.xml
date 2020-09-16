@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">电视通话</string>
+    <string name="call_video">视频通话</string>
+    <string name="call_audio">语音通话</string>
+    <string name="answer">接听</string>
+    <string name="hang_up">挂断</string>
+    <string name="mute">静音</string>
+    <string name="qiev">切换摄像头</string>
+    <string name="qiev2">切换语音通话</string>
+    <string name="switch_view">切换视频窗口</string>
+    <string name="del_contacts">删除联系人</string>
+    <string name="del_callrecord">删除记录</string>
+    <string name="add_contacts">添加联系人</string>
+    <string name="edit_contacts">编辑联系人</string>
+    <string name="save">保存</string>
+    <string name="cancel">取消</string>
+    <string name="input_name">请输入姓名</string>
+    <string name="input_phone">请输入号码</string>
+    <string name="back">返回</string>
+    <string name="next">下一页</string>
+    <string name="welcome">敬请期待</string>
+    <string name="welcome2">初次使用请拨打4009900901咨询开通</string>
+    <string name="remider">温馨提示</string>
+    <string name="calltime_timeout">您已经连续通话超过1小时\n是否继续通话？</string>
+    <string name="selectphone_info">确定要使用此固话号码\n作为您的电视电话本机号码吗？</string>
+    <string name="commit">确定</string>
+</resources>
