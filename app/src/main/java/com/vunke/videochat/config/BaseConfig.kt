@@ -8,7 +8,6 @@ object BaseConfig {
     val port = "5060"
     val areaCode = "+86"
     val lastCallNumber = "LAST_CALL_NUMBER"
-    val NINE = "9"
     val RECEIVE_MAIN_ACTIVITY = "receive_main_activity";
     val RECEIVE_VIDEO_ACTIVITY = "receive_video_activity"
 }
