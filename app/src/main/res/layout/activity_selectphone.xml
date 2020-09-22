@@ -7,10 +7,25 @@
     <android.support.v7.widget.RecyclerView
         android:id="@+id/selectphone_recycler"
         android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_marginTop="180dp"
         android:layout_gravity="center_horizontal"
         android:layout_centerHorizontal="true"
-        android:layout_height="match_parent">
+        android:layout_above="@+id/selectphone_rl2">
 
     </android.support.v7.widget.RecyclerView>
+    <RelativeLayout
+        android:id="@+id/selectphone_rl2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="40dp"
+        android:layout_alignParentBottom="true">
+        <Button
+            android:id="@+id/selectphone_changebatch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:visibility="invisible"
+            android:background="@drawable/but_changebatch_selector"/>
+    </RelativeLayout>
 </RelativeLayout>

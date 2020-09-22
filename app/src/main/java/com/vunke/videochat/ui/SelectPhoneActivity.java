@@ -7,6 +7,8 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 
 import com.google.gson.Gson;
 import com.lzy.okgo.OkGo;
@@ -35,6 +37,7 @@ public class SelectPhoneActivity extends AppCompatActivity {
     private RecyclerView select_num_recvcler;
     private SelectPhoneAdapter adapter;
     private List<String> phoneList;
+    private Button selectphone_changebatch;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,9 +70,7 @@ public class SelectPhoneActivity extends AppCompatActivity {
                                     AccountBean accountBean = new Gson().fromJson(response.body(), AccountBean.class);
                                     if (accountBean!=null){
                                         if (200==accountBean.getCode()){
-                                            phoneList = accountBean.getOptionalFixedLine();
-                                            adapter = new SelectPhoneAdapter(SelectPhoneActivity.this,phoneList);
-                                            select_num_recvcler.setAdapter(adapter);
+                                            initReceiverData(accountBean);
                                         }
                                     }
                                 }catch (Exception e){
@@ -88,9 +89,57 @@ public class SelectPhoneActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
-
+    private int page = 1;
+    private int maxpage= 0;
+    private void initReceiverData(AccountBean accountBean) {
+        phoneList = accountBean.getOptionalFixedLine();
+        if (phoneList!=null&&phoneList.size()!=0){
+            maxpage = phoneList.size() % 9;
+            Log.i(TAG, "initReceiverData: get max page:"+maxpage);
+            if (phoneList.size()<=9){
+                adapter = new SelectPhoneAdapter(SelectPhoneActivity.this,phoneList);
+                select_num_recvcler.setAdapter(adapter);
+                selectphone_changebatch.setVisibility(View.VISIBLE);
+            }else{
+                setPageList(phoneList,0);
+            }
+        }
+    }
+    private void setPageList(List<String> list,int page){
+        try {
+            List<String> pageList = null;
+            int i = list.size() - page * 10;
+            if (i>0){
+                pageList = list.subList(page*9,(page+1)*9);
+            }else if (i<=0){
+                pageList = list.subList(page*9,list.size());
+            }
+            adapter = new SelectPhoneAdapter(SelectPhoneActivity.this,pageList);
+            select_num_recvcler.setAdapter(adapter);
+            if (selectphone_changebatch.getVisibility()!=View.VISIBLE){
+                selectphone_changebatch.setVisibility(View.VISIBLE);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
     private void initView() {
         select_num_recvcler = findViewById(R.id.selectphone_recycler);
+        selectphone_changebatch = findViewById(R.id.selectphone_changebatch);
+        selectphone_changebatch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (phoneList!=null&&phoneList.size()!=0){
+                    if (page+1<=maxpage){
+                        page++;
+                        setPageList(phoneList,page);
+                    }else{
+                        page = 0;
+                        setPageList(phoneList,page);
+                    }
+                }
+            }
+        });
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this,3);
         select_num_recvcler.setLayoutManager(gridLayoutManager);
         gridLayoutManager.setOrientation(GridLayoutManager.VERTICAL);

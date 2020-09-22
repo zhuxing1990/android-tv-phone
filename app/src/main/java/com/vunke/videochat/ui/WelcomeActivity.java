@@ -6,11 +6,6 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.vunke.videochat.R;
 
-import java.util.concurrent.TimeUnit;
-
-import io.reactivex.Observable;
-import io.reactivex.functions.Consumer;
-
 /**
  * Created by zhuxi on 2020/8/29.
  */
@@ -20,14 +15,13 @@ public class WelcomeActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome);
-        Observable.interval(10, TimeUnit.SECONDS)
-                .subscribe(new Consumer<Long>() {
-                    @Override
-                    public void accept(Long aLong) throws Exception {
-                        finish();
-                        System.exit(0);
-                    }
-                });
-
+//        Observable.interval(10, TimeUnit.SECONDS)
+//                .subscribe(new Consumer<Long>() {
+//                    @Override
+//                    public void accept(Long aLong) throws Exception {
+//                        finish();
+//                        System.exit(0);
+//                    }
+//                });
     }
 }

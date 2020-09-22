@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">电视通话</string>
+    <string name="app_name">电视电话</string>
     <string name="call_video">视频通话</string>
     <string name="call_audio">语音通话</string>
     <string name="answer">接听</string>

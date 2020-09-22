@@ -1,6 +1,8 @@
 package com.vunke.videochat.manage;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 
@@ -32,15 +34,32 @@ public class SelectPhoneManage {
                         @Override
                         public void onSuccess(Response<String> response) {
                             Log.i(TAG, "onSuccess: "+response.body());
-                            final SuccessfulOpenDialog successfulOpenDialog = new SuccessfulOpenDialog(context);
-                            successfulOpenDialog.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    successfulOpenDialog.cancel();
-                                    context.finish();
+                            try {
+                                if (!TextUtils.isEmpty(response.body())){
+                                    JSONObject js = new JSONObject(response.body());
+                                    if (js.has("code")){
+                                        int code = js.getInt("code");
+                                        if (200==code){
+                                            Intent intent = new Intent(BaseConfig.RECEVIE_OPEN_OVER);
+                                            context.sendBroadcast(intent);
+                                            final SuccessfulOpenDialog successfulOpenDialog = new SuccessfulOpenDialog(context);
+                                            successfulOpenDialog.setOnClickListener(new View.OnClickListener() {
+                                                @Override
+                                                public void onClick(View v) {
+                                                    successfulOpenDialog.cancel();
+                                                    context.finish();
+                                                }
+                                            });
+                                            successfulOpenDialog.show();
+                                        }else{
+
+                                        }
+                                    }
                                 }
-                            });
-                            successfulOpenDialog.show();
+                            }catch (Exception e){
+                                e.printStackTrace();
+                            }
+
                         }
 
                         @Override

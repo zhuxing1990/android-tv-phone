@@ -1,6 +1,8 @@
 package com.vunke.videochat.fragment;
 
 import android.app.Fragment;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.hardware.Camera;
@@ -37,15 +39,6 @@ import com.vunke.videochat.tools.SPUtils;
 import com.vunke.videochat.ui.HomeActivity;
 import com.vunke.videochat.ui.ProductDesActivity;
 import com.vunke.videochat.ui.SelectPhoneActivity;
-
-import java.util.concurrent.TimeUnit;
-
-import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Function;
-import io.reactivex.functions.Predicate;
-import io.reactivex.observers.DisposableObserver;
-import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created by zhuxi on 2020/2/27.
@@ -104,7 +97,21 @@ public class CallFragment extends Fragment implements View.OnClickListener {
     }
 
     public RegisterReceiver mReceiver;
-
+    public BroadcastReceiver openReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent!=null){
+                String action = intent.getAction();
+                if (!TextUtils.isEmpty(action)){
+                    switch (action){
+                        case BaseConfig.RECEVIE_OPEN_OVER:
+                            initLogin();
+                            break;
+                    }
+                }
+            }
+        }
+    };
     private void registerBroad() {
         mReceiver = new RegisterReceiver(new RegisterCallBack() {
             @Override
@@ -132,6 +139,9 @@ public class CallFragment extends Fragment implements View.OnClickListener {
         });
         IntentFilter intentFilter = new IntentFilter(BaseConfig.RECEIVE_MAIN_ACTIVITY);
         getActivity().registerReceiver(mReceiver,intentFilter);
+        IntentFilter openFilter = new IntentFilter();
+        openFilter.addAction(BaseConfig.RECEVIE_OPEN_OVER);
+        getActivity().registerReceiver(openReceiver,openFilter);;
     }
 
     private void initView(View view) {
@@ -362,6 +372,7 @@ public class CallFragment extends Fragment implements View.OnClickListener {
                         instance = LinphoneMiniManager.getInstance();
                     }
                     stratLogin(userName,passWord);
+                    call_openforuse.setVisibility(View.GONE);
                 }
 
                 @Override
@@ -370,6 +381,9 @@ public class CallFragment extends Fragment implements View.OnClickListener {
                     Log.i(TAG, "onSuccess: get loginInfo failed");
 //                    call_login_status.setText("获取登陆信息失败:"+loginInfo.getMessage());
                     call_username.setText("您尚未开通此产品");
+                    if (call_openforuse.getVisibility() !=View.VISIBLE){
+                        call_openforuse.setVisibility(View.VISIBLE);
+                    }
                     call_openforuse.requestFocus();
 //                    Intent intent = new Intent(getActivity(), WelcomeActivity.class);
 //                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -383,56 +397,12 @@ public class CallFragment extends Fragment implements View.OnClickListener {
                     Log.i(TAG, "onSuccess: get loginInfo error");
 //                    call_login_status.setText("网络异常，登录失败");
                     call_username.setText("网络异常，登录失败");
+                    call_openforuse.setVisibility(View.GONE);
                 }
             });
         }
     }
-    private void stopClick(final Button button,final long stopTime) {
-        Log.i(TAG, "stopClick: ");
-        button.setEnabled(false);
-        Observable<Long> longObservable = Observable.interval(0, 1, TimeUnit.SECONDS)
-                .filter(new Predicate<Long>() {
-                    @Override
-                    public boolean test(Long t) throws Exception {
-                        return t <= stopTime;
-                    }
-                }).map(new Function<Long, Long>() {
-                    @Override
-                    public Long apply(Long t) throws Exception {
-                        return -(t-stopTime);
-                    }
-                }).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
 
-        DisposableObserver<Long> disposableObserver = new DisposableObserver<Long>() {
-
-            @Override
-            public void onNext(Long aLong) {
-                Log.i(TAG, "onNext: "+aLong);
-                if (aLong>0){
-                    button.setText( aLong + "".trim());
-                }else{
-                    button.setText("登录");
-                    onComplete();
-                }
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                Log.i(TAG, "onError: ");
-                button.setEnabled(true);
-                this.dispose();
-            }
-
-            @Override
-            public void onComplete() {
-                Log.i(TAG, "onComplete: ");
-                button.setEnabled(true);
-                this.dispose();
-            }
-        };
-        longObservable.subscribe(disposableObserver);
-    }
 
     private View.OnKeyListener keyListener = new View.OnKeyListener() {
 
@@ -513,6 +483,9 @@ public class CallFragment extends Fragment implements View.OnClickListener {
                 if (null!=dialog&& dialog.isShow()){
                     dialog.cancel();
                 }
+            }
+            if (openReceiver!=null){
+                getActivity().unregisterReceiver(openReceiver);
             }
         }catch (Exception e){
             e.printStackTrace();

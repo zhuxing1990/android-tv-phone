@@ -7,13 +7,24 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.text.format.DateFormat;
 import android.text.format.DateUtils;
+import android.util.Log;
+import android.widget.Button;
+
+import java.util.concurrent.TimeUnit;
+
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Function;
+import io.reactivex.functions.Predicate;
+import io.reactivex.observers.DisposableObserver;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created by zhuxi on 2020/4/13.
  */
 
 public class Utils {
-
+    private static final String TAG = "Utils";
     /**
      * 使用系统工具类判断是否是今天 是今天就显示发送的小时分钟 不是今天就显示发送的那一天
      * */
@@ -84,5 +95,51 @@ public class Utils {
             e.printStackTrace();
         }
         return packageInfo;
+    }
+    public static void stopClick(final Button button, final long stopTime) {
+        Log.i(TAG, "stopClick: ");
+        button.setEnabled(false);
+        Observable<Long> longObservable = Observable.interval(0, 1, TimeUnit.SECONDS)
+                .filter(new Predicate<Long>() {
+                    @Override
+                    public boolean test(Long t) throws Exception {
+                        return t <= stopTime;
+                    }
+                }).map(new Function<Long, Long>() {
+                    @Override
+                    public Long apply(Long t) throws Exception {
+                        return -(t-stopTime);
+                    }
+                }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+
+        DisposableObserver<Long> disposableObserver = new DisposableObserver<Long>() {
+
+            @Override
+            public void onNext(Long aLong) {
+                Log.i(TAG, "onNext: "+aLong);
+                if (aLong>0){
+                    button.setText( aLong + "".trim());
+                }else{
+                    button.setText("登录");
+                    onComplete();
+                }
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                Log.i(TAG, "onError: ");
+                button.setEnabled(true);
+                this.dispose();
+            }
+
+            @Override
+            public void onComplete() {
+                Log.i(TAG, "onComplete: ");
+                button.setEnabled(true);
+                this.dispose();
+            }
+        };
+        longObservable.subscribe(disposableObserver);
     }
 }
