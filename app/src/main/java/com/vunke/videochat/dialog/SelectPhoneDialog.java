@@ -2,10 +2,12 @@ package com.vunke.videochat.dialog;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.vunke.videochat.R;
 
@@ -18,6 +20,7 @@ public class SelectPhoneDialog implements View.OnKeyListener {
     private Context context;
     private Dialog dialog;
     private View mView;
+    private TextView selectphone_info;
     public SelectPhoneDialog(Context context){
         this.context=context;
         builder();
@@ -26,6 +29,7 @@ public class SelectPhoneDialog implements View.OnKeyListener {
     public void builder(){
         mView  = LayoutInflater.from(context).inflate(R.layout.dialog_selectphone,null);
         selectphone_commit = mView.findViewById(R.id.selectphone_commit);
+        selectphone_info = mView.findViewById(R.id.selectphone_info);
         selectphone_commit.requestFocus();
         RelativeLayout selectphone_back = mView.findViewById(R.id.selectphone_back);
         selectphone_back.setOnClickListener(new View.OnClickListener() {
@@ -46,7 +50,11 @@ public class SelectPhoneDialog implements View.OnKeyListener {
         }
         return this;
     }
-
+    public void setMessage(String message){
+        if (!TextUtils.isEmpty(message)){
+            selectphone_info.setText(message);
+        }
+    }
     public boolean isShow() {
         return isShow;
     }

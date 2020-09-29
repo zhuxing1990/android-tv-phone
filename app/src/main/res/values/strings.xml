@@ -24,4 +24,10 @@
     <string name="calltime_timeout">您已经连续通话超过1小时\n是否继续通话？</string>
     <string name="selectphone_info">确定要使用此固话号码\n作为您的电视电话本机号码吗？</string>
     <string name="commit">确定</string>
+    <string name="product_name">产品名称:</string>
+    <string name="order_name">电视电话包月（0元/月）</string>
+    <string name="call_rate">本产品无月租费，通话产生的费用根据实际使用情况收取</string>
+    <string name="open_des">电视电话开通后,话费将产生在:</string>
+    <string name="card_des">,身份证后四位</string>
+    <string name="call_rate_des">的用户话单中</string>
 </resources>

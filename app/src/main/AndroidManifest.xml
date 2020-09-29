@@ -65,6 +65,9 @@
         <activity android:name=".ui.AudioActivity"></activity>
         <activity android:name=".ui.BackgroundActivity"></activity>
         <activity android:name=".ui.WelcomeActivity"></activity>
+        <activity android:name=".ui.OrderActivity">
+
+        </activity>
         <activity android:name=".ui.TestActivity">
             <!-- <intent-filter> -->
             <!-- <action android:name="android.intent.action.MAIN" /> -->

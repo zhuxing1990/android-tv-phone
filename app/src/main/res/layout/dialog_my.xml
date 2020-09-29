@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content" android:layout_height="wrap_content"
+    android:padding="20dp"
+    android:background="@drawable/relative_bg_calltime">
+    <TextView
+        android:id="@+id/my_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="33sp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:textColor="@color/color_black_47"
+        android:text="@string/remider"
+        />
+    <TextView
+        android:id="@+id/my_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:layout_centerHorizontal="true"
+        android:textColor="@color/color_gray_90"
+        android:layout_below="@+id/my_title"
+        android:layout_marginTop="30dp"
+        android:textSize="31sp"/>
+    <RelativeLayout
+        android:id="@+id/my_commit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:layout_centerHorizontal="true"
+        android:focusable="true"
+        android:background="@drawable/button_calltime_selector"
+        android:layout_below="@+id/my_message">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_centerInParent="true"
+                android:textSize="27sp"
+                android:duplicateParentState="true"
+                android:text="@string/commit"
+                android:textColor="@drawable/text_calltime_selector"
+                />
+    </RelativeLayout>
+</RelativeLayout>

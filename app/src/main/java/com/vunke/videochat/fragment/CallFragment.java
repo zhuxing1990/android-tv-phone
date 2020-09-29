@@ -37,8 +37,8 @@ import com.vunke.videochat.service.LinphoneMiniManager;
 import com.vunke.videochat.tools.FocusUtil;
 import com.vunke.videochat.tools.SPUtils;
 import com.vunke.videochat.ui.HomeActivity;
+import com.vunke.videochat.ui.OrderActivity;
 import com.vunke.videochat.ui.ProductDesActivity;
-import com.vunke.videochat.ui.SelectPhoneActivity;
 
 /**
  * Created by zhuxi on 2020/2/27.
@@ -298,7 +298,7 @@ public class CallFragment extends Fragment implements View.OnClickListener {
     }
 
     private void ShowOpenView() {
-        Intent intent = new Intent(getActivity(), SelectPhoneActivity.class);
+        Intent intent = new Intent(getActivity(), OrderActivity.class);
         startActivity(intent);
     }
 

@@ -16,11 +16,11 @@ public class UserInfoUtil {
     /**
      * 认证数据库
      */
-    private Uri authUri = Uri.parse("content://com.huawei.hunandx.auth.provider/authinfo");
-    private Uri mangguoUir = Uri.parse("content://com.hunantv.operator.mango.hndxiptv/userinfo");
+    private static Uri authUri = Uri.parse("content://com.huawei.hunandx.auth.provider/authinfo");
+    private static Uri mangguoUir = Uri.parse("content://com.hunantv.operator.mango.hndxiptv/userinfo");
     private static UserInfoUtil userInfoUtil;
-    private String userId = "";
-    private String userToken = "";
+    private static String userId = "";
+    private static String userToken = "";
 
     public String getUserToken() {
         return userToken;
@@ -44,6 +44,7 @@ public class UserInfoUtil {
                 userInfoUtil = new UserInfoUtil(context);
             }
         }
+        queryDeviceInfo(context);
         return userInfoUtil;
     }
 
@@ -56,7 +57,7 @@ public class UserInfoUtil {
      *
      * @param context 上下文
      */
-    public void queryDeviceInfo(Context context) {
+    public static void queryDeviceInfo(Context context) {
         PackageInfo packageInfo = Utils.getPackageInfo(context, "com.vunke.auth");
         Cursor mCursor;
         if (packageInfo != null) {
