@@ -342,6 +342,15 @@ public class LinphoneMiniManager extends Service implements LinphoneCoreListener
                                       boolean encrypted, String authenticationToken) {
 		Log.e("提示","lilin  callEncryptionChanged: " );
 	}
+	private boolean isLogin = false;
+
+	public boolean isLogin() {
+		return isLogin;
+	}
+
+	public void setLogin(boolean login) {
+		isLogin = login;
+	}
 
 	@Override
 	public void registrationState(LinphoneCore lc, LinphoneProxyConfig cfg,
@@ -350,7 +359,15 @@ public class LinphoneMiniManager extends Service implements LinphoneCoreListener
 		Intent intent = new Intent(BaseConfig.INSTANCE.getRECEIVE_MAIN_ACTIVITY());
 		intent.putExtra("action", "reg_state");intent.putExtra("data",smessage );
 		sendBroadcast( intent);
-
+		if (!TextUtils.isEmpty(smessage)){
+			if (smessage.contains("success")){
+				isLogin = true;
+			}else{
+				isLogin = false;
+			}
+		}else{
+			isLogin = false;
+		}
 		if( smessage.indexOf("successful")!=-1){
 			String str="";
 			PayloadType[] audioCodecs = mLinphoneCore.getAudioCodecs();

@@ -26,7 +26,7 @@ import io.reactivex.schedulers.Schedulers;
 
 public class BackgroundActivity extends AppCompatActivity{
     private static final String TAG = "BackgroundActivity";
-    private int[] imgArr = {R.mipmap.bg1, R.mipmap.bg2, R.mipmap.bg3, R.mipmap.bg4};
+    private int[] imgArr = {R.mipmap.bg0,R.mipmap.bg1, R.mipmap.bg2, R.mipmap.bg3, R.mipmap.bg4};
     private Button bg_left_bt,bg_right_bt,bg_confirm;
     private ImageView bg_content,bg_img_left,bg_img_right;
     //图片下标序号
@@ -59,15 +59,18 @@ public class BackgroundActivity extends AppCompatActivity{
             public void onClick(View v) {
                 switch (count){
                     case 0:
-                        BackgroundManage.updateBackground(BackgroundActivity.this,"1");
+                        BackgroundManage.updateBackground(BackgroundActivity.this,"0");
                         break;
                     case 1:
-                        BackgroundManage.updateBackground(BackgroundActivity.this,"2");
+                        BackgroundManage.updateBackground(BackgroundActivity.this,"1");
                         break;
                     case 2:
-                        BackgroundManage.updateBackground(BackgroundActivity.this,"3");
+                        BackgroundManage.updateBackground(BackgroundActivity.this,"2");
                         break;
                     case 3:
+                        BackgroundManage.updateBackground(BackgroundActivity.this,"3");
+                        break;
+                    case 4:
                         BackgroundManage.updateBackground(BackgroundActivity.this,"4");
                         break;
                 }

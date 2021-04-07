@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/IPTV_VideoChat.iml" filepath="$PROJECT_DIR$/IPTV_VideoChat.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/VideoChat.iml" filepath="$PROJECT_DIR$/VideoChat.iml" group="VideoChat" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" group="VideoChat/app" />
     </modules>
   </component>
 </project>

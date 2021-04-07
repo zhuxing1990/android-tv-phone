@@ -3,6 +3,7 @@ package com.vunke.videochat.base;
 import android.app.Fragment;
 
 import com.vunke.videochat.fragment.AttnFragment;
+import com.vunke.videochat.fragment.BackgroundFragment;
 import com.vunke.videochat.fragment.CallFragment;
 import com.vunke.videochat.fragment.ContactsFragment;
 
@@ -22,6 +23,8 @@ public class HomeFragmentFactory {
 				fragment = new ContactsFragment();
 			} else if (position == 2) {
 				fragment = new AttnFragment();
+			}else if (position ==3){
+				fragment = new BackgroundFragment();
 			}
 		}
 		if (fragment != null) {

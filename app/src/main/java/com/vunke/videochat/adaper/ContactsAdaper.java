@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.hardware.Camera;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,11 +16,13 @@ import android.widget.Toast;
 import com.vunke.videochat.R;
 import com.vunke.videochat.dao.ContactsDao;
 import com.vunke.videochat.db.Contacts;
-import com.vunke.videochat.dialog.AddContactsDialog;
+import com.vunke.videochat.db.ContactsTable;
 import com.vunke.videochat.dialog.NotCameraDialog;
 import com.vunke.videochat.dialog.SetContactDialog;
 import com.vunke.videochat.manage.CallManage;
-import com.vunke.videochat.receiver.CallRecordReceiver;
+import com.vunke.videochat.manage.ContactsManage;
+import com.vunke.videochat.receiver.ContactsReceiver;
+import com.vunke.videochat.ui.AddContactActivity;
 
 import java.util.List;
 
@@ -41,6 +42,11 @@ public class ContactsAdaper extends RecyclerView.Adapter<ContactsAdaper.Contacts
     public void update(List<Contacts> newList) {
         list.clear();
         list.addAll(newList);
+        if (null==newList||0==newList.size()){
+            Intent intent = new Intent();
+            intent.setAction(ContactsReceiver.CONTACTS_ADD_ACTION);
+            context.sendBroadcast(intent);
+        }
         this.notifyDataSetChanged();
     }
     @Override
@@ -120,14 +126,18 @@ public class ContactsAdaper extends RecyclerView.Adapter<ContactsAdaper.Contacts
             @Override
             public void onClick(View v) {
                 String phone = list.get(position).getPhone();
-                int deletePhone = ContactsDao.Companion.getInstance(context).deletePhone(phone);
+//                int deletePhone = ContactsDao.Companion.getInstance(context).deletePhone(phone);//------------------数据库更新
+                int deletePhone = ContactsDao.Companion.getInstance(context).deleteContacts(context,list.get(position));
                 if (deletePhone!=-1){
                     Toast.makeText(context,"删除成功",Toast.LENGTH_SHORT).show();
                     setContactDialog.cancel();
+                    ContactsManage.DelContacts(context,list.get(position));
                 }else{
                     Toast.makeText(context,"删除失败",Toast.LENGTH_SHORT).show();
                 }
-             List<Contacts> contactsList = ContactsDao.Companion.getInstance(mcontext).queryAll();
+
+//             List<Contacts> contactsList = ContactsDao.Companion.getInstance(mcontext).queryAll();;//------------------数据库更新
+             List<Contacts> contactsList = ContactsDao.Companion.getInstance(mcontext).queryAll(context);
              update(contactsList);
             }
         });
@@ -151,60 +161,70 @@ public class ContactsAdaper extends RecyclerView.Adapter<ContactsAdaper.Contacts
         setContactDialog.show();
     }
 
-    private AddContactsDialog dialog;
+//    private AddContactsDialog dialog;
     private void AddContact(final String oldphone,final String oldname,final Long id) {
-        if (dialog!=null&&dialog.isShowing()){
-            dialog.cancel();
-        }
-        dialog = new AddContactsDialog(context).builder();
-        dialog.setPhoenEdit(oldphone);
+        Intent intent = new Intent(context, AddContactActivity.class);
+        intent.putExtra(ContactsTable.INSTANCE.getUSER_NAME(),oldname);
+        intent.putExtra(ContactsTable.INSTANCE.getPHONE(),oldphone);
+        intent.putExtra(ContactsTable.INSTANCE.get_ID(),id);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        context.startActivity(intent);
+//        if (dialog!=null&&dialog.isShowing()){
+//            dialog.cancel();
+//        }
+//        dialog = new AddContactsDialog(context).builder();
+//        dialog.setPhoenEdit(oldphone);
 //        dialog.setNameEdit(oldname);
-        dialog.setPositiveButton("", new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String name = dialog.getNameEdit().toString();
-                String phone = dialog.getPhoenEdit().toString();
-
-                if (TextUtils.isEmpty(name)){
-                    Toast.makeText(context,"请输入姓名",Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                if (TextUtils.isEmpty(phone)){
-                    Toast.makeText(context,"请输入号码",Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                if (oldname.equals(name)&&oldphone.equals(phone)){
-                    dialog.cancel();
-                }else{
-                    Contacts contacts = new Contacts();
-                    contacts.setUser_name(name);
-                    contacts.setPhone(phone);
-                    contacts.set_id(id);
-                    int updateContacts = ContactsDao.Companion.getInstance(context).updateContacts(contacts);
-                    Intent intent = new Intent();
-                    intent.setAction(CallRecordReceiver.CALL_RECORD_ACTION);
-                    context.sendBroadcast(intent);
-                    Log.i(TAG, "onClick: updateContacts:"+updateContacts);
-                    if (updateContacts!=-1){
-                        Log.i(TAG, "onClick: update success");
-                    }else{
-                        Log.i(TAG, "onClick: update failed");
-                    }
-                    List<Contacts> contactsList = ContactsDao.Companion.getInstance(context).queryAll();
-                    update(contactsList);
-                    dialog.cancel();
-                }
-
-            }
-        });
-        dialog.setNeutralButton("", new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.cancel();
-            }
-        });
-        dialog.setCancelable(false);
-        dialog.show();
+//        dialog.setPositiveButton("", new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                String name = dialog.getNameEdit().toString();
+//                String phone = dialog.getPhoenEdit().toString();
+//
+//                if (TextUtils.isEmpty(name)){
+//                    Toast.makeText(context,"请输入姓名",Toast.LENGTH_SHORT).show();
+//                    return;
+//                }
+//                if (TextUtils.isEmpty(phone)){
+//                    Toast.makeText(context,"请输入号码",Toast.LENGTH_SHORT).show();
+//                    return;
+//                }
+//                if (!Utils.isNumeric(phone)){
+//                    Toast.makeText(context,"号码请输入数字",Toast.LENGTH_SHORT).show();
+//                    return;
+//                }
+//                if (oldname.equals(name)&&oldphone.equals(phone)){
+//                    dialog.cancel();
+//                }else{
+//                    Contacts contacts = new Contacts();
+//                    contacts.setUser_name(name);
+//                    contacts.setPhone(phone);
+//                    contacts.set_id(id);
+//                    int updateContacts = ContactsDao.Companion.getInstance(context).updateContacts(contacts);
+//                    Intent intent = new Intent();
+//                    intent.setAction(CallRecordReceiver.CALL_RECORD_ACTION);
+//                    context.sendBroadcast(intent);
+//                    Log.i(TAG, "onClick: updateContacts:"+updateContacts);
+//                    if (updateContacts!=-1){
+//                        Log.i(TAG, "onClick: update success");
+//                    }else{
+//                        Log.i(TAG, "onClick: update failed");
+//                    }
+////                    List<Contacts> contactsList = ContactsDao.Companion.getInstance(context).queryAll();//------------------数据库更新
+//                    List<Contacts> contactsList = ContactsDao.Companion.getInstance(context).queryAll(context);
+//                    update(contactsList);
+//                    dialog.cancel();
+//                }
+//
+//            }
+//        });
+//        dialog.setNeutralButton("", new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                dialog.cancel();
+//            }
+//        });
+//        dialog.setCancelable(false);
+//        dialog.show();
     }
 }

@@ -7,13 +7,14 @@
         android:id="@+id/order_orderinfo_rl"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="240dp"
-        android:layout_marginRight="240dp"
+        android:layout_marginLeft="230dp"
+        android:layout_marginRight="230dp"
         android:layout_centerInParent="true">
         <RelativeLayout
             android:id="@+id/order_product_rl"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp">
             <TextView
                 android:id="@+id/order_product_name"
                 android:layout_width="wrap_content"
@@ -34,6 +35,7 @@
             android:id="@+id/order_call__rate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:lineSpacingExtra="8dp"
             android:text="@string/call_rate"
             android:textSize="24sp"
             android:layout_below="@+id/order_product_rl"/>
@@ -41,6 +43,7 @@
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
             android:layout_below="@+id/order_call__rate">
             <TextView
                 android:id="@+id/order_open_des"
@@ -77,6 +80,7 @@
                 android:layout_height="wrap_content"
                 android:layout_toRightOf="@+id/order_usercard"
                 android:textSize="24sp"
+                android:visibility="invisible"
                 android:text="@string/call_rate_des"/>
         </RelativeLayout>
     </RelativeLayout>

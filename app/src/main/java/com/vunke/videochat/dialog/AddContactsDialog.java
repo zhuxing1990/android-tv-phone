@@ -2,6 +2,7 @@ package com.vunke.videochat.dialog;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -10,9 +11,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import com.vunke.videochat.R;
+import com.vunke.videochat.login.UserInfoUtil;
+import com.vunke.videochat.tools.UiUtil;
 
 import java.io.Serializable;
 
@@ -23,17 +27,16 @@ import java.io.Serializable;
 public class AddContactsDialog implements Serializable {
     private static final String TAG = "AddContactsDialog";
     private Context context;
-//    private Display display;
     private Dialog dialog;
     private RelativeLayout dialog_add_window;
     private View mDecor;
     private EditText add_usernameedit,add_phoneedit;
     private Button add_commit_but,add_cancel_but;
+    private ImageView add_qrcode_image;
     private boolean isShow = false;
     public AddContactsDialog(Context context){
         this.context = context;
-//        WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-//        display = windowManager.getDefaultDisplay();
+
     }
     public AddContactsDialog builder(){
         mDecor = LayoutInflater.from(context).inflate(R.layout.dialog_addcontacts,null);
@@ -42,6 +45,8 @@ public class AddContactsDialog implements Serializable {
         add_phoneedit = mDecor.findViewById(R.id.add_phoneedit);
         add_commit_but = mDecor.findViewById(R.id.add_save_but);
         add_cancel_but = mDecor.findViewById(R.id.add_cancel_but);
+        add_qrcode_image = mDecor.findViewById(R.id.add_qrcode_image);
+        initQrCode();
         dialog = new Dialog(context, R.style.AlertDialogStyle);
         dialog.setContentView(mDecor);
         add_phoneedit.setOnKeyListener(new View.OnKeyListener() {
@@ -58,10 +63,19 @@ public class AddContactsDialog implements Serializable {
                 return false;
             }
         });
+
         //        dialog_add_window.setLayoutParams(new FrameLayout.LayoutParams((int) (display
 //                .getWidth() * 0.85), LinearLayout.LayoutParams.WRAP_CONTENT));
         return this;
     }
+
+    private void initQrCode() {
+        UserInfoUtil userInfoUtil = UserInfoUtil.getInstance(context);
+        String userId = userInfoUtil.getUserId();
+        Bitmap qrcodeImage = UiUtil.getQrcodeImage(userId);
+        add_qrcode_image.setImageBitmap(qrcodeImage);
+    }
+
     public AddContactsDialog setNameEditTextHint(CharSequence hint){
         if (!TextUtils.isEmpty(hint)){
             add_usernameedit.setHint(hint);

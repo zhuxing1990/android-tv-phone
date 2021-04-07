@@ -2,7 +2,6 @@ package com.vunke.videochat.ui;
 
 import android.app.Fragment;
 import android.app.FragmentTransaction;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
@@ -17,6 +16,7 @@ import android.widget.Toast;
 import com.vunke.videochat.R;
 import com.vunke.videochat.base.HomeFragmentFactory;
 import com.vunke.videochat.fragment.AttnFragment;
+import com.vunke.videochat.fragment.BackgroundFragment;
 import com.vunke.videochat.fragment.CallFragment;
 import com.vunke.videochat.fragment.ContactsFragment;
 import com.vunke.videochat.manage.BackgroundManage;
@@ -30,10 +30,9 @@ import java.util.List;
  */
 
 public class HomeActivity extends FragmentActivity implements ViewPager.OnPageChangeListener, View.OnClickListener,View.OnFocusChangeListener
-//        ,View.OnKeyListener
+        ,View.OnKeyListener
 {
     private static final String TAG = "HomeActivity";
-//    public Button home_Call,home_Contacts,home_Attn;
     public RelativeLayout home_call_rl,home_contacts_rl,home_atth_rl,home_bg_rl;
     private List<Fragment> fragments;
     /**
@@ -49,6 +48,10 @@ public class HomeActivity extends FragmentActivity implements ViewPager.OnPageCh
      * 最近联系界面
      */
     private AttnFragment fragment3;
+    /**
+     * 切换背景界面
+     */
+    private BackgroundFragment fragment4;
     private FrameLayout home_frame_lr;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -67,6 +70,7 @@ public class HomeActivity extends FragmentActivity implements ViewPager.OnPageCh
         fragment2 = (ContactsFragment) HomeFragmentFactory
                 .createFragment(1);
         fragment3 = (AttnFragment) HomeFragmentFactory.createFragment(2);
+        fragment4 = (BackgroundFragment) HomeFragmentFactory.createFragment(3);
     }
     private void setFragment(int index) {
         FragmentTransaction beginTransaction = getFragmentManager()
@@ -77,6 +81,7 @@ public class HomeActivity extends FragmentActivity implements ViewPager.OnPageCh
             fragments.add(fragment1);
             fragments.add(fragment2);
             fragments.add(fragment3);
+            fragments.add(fragment4);
             for (int i = 0; i < fragments.size(); i++) {
                 if (!fragments.get(i).isAdded()) {
                     beginTransaction.add(R.id.home_frame_lr, fragments.get(i),"f" + i);
@@ -145,60 +150,28 @@ public class HomeActivity extends FragmentActivity implements ViewPager.OnPageCh
         home_call_rl.setOnFocusChangeListener(this);
         home_contacts_rl.setOnFocusChangeListener(this);
         home_atth_rl.setOnFocusChangeListener(this);
-        home_bg_rl.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(HomeActivity.this,BackgroundActivity.class);
-                startActivity(intent);
-            }
-        });
-
+        home_bg_rl.setOnFocusChangeListener(this);
+//        home_bg_rl.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent intent = new Intent(HomeActivity.this,BackgroundActivity.class);
+//                startActivity(intent);
+//            }
+//        });
+        home_call_rl.setOnFocusChangeListener(this);
+        home_atth_rl.setOnFocusChangeListener(this);
+        home_contacts_rl.setOnFocusChangeListener(this);
+        home_call_rl.setOnKeyListener(this);
+        home_contacts_rl.setOnKeyListener(this);
+        home_atth_rl.setOnKeyListener(this);
+        home_bg_rl.setOnKeyListener(this);
+//        home_bg_rl.setOnKeyListener(this);
 //        home_Call.setOnKeyListener(this);
 //        home_Contacts.setOnKeyListener(this);
 //        home_Attn.setOnKeyListener(this);
     }
 
-//    @Override
-//    public boolean onKey(View v, int keyCode, KeyEvent event) {
-//        if (event.getAction() == KeyEvent.ACTION_DOWN) {
-//            switch (v.getId()){
-//                case R.id.home_Call:
-//                    if (keyCode == KeyEvent.KEYCODE_DPAD_DOWN) {
-////                            home_Contacts.requestFocus();
-//                            back true;
-//                    } else if (keyCode == KeyEvent.KEYCODE_DPAD_RIGHT){
-//
-//                    }else if (keyCode == KeyEvent.KEYCODE_DPAD_UP) {
-////                            home_Attn.requestFocus();
-//                            back true;
-//                    }
-//                    break;
-//                case R.id.home_Contacts:
-//                    if (keyCode == KeyEvent.KEYCODE_DPAD_DOWN) {
-////                            home_Attn.requestFocus();
-//                            back true;
-//                    } else if (keyCode == KeyEvent.KEYCODE_DPAD_RIGHT){
-//
-//                    }else if (keyCode == KeyEvent.KEYCODE_DPAD_UP) {
-////                            home_Call.requestFocus();
-//                            back true;
-//                    }
-//                    break;
-//                case R.id.home_Attn:
-//                    if (keyCode == KeyEvent.KEYCODE_DPAD_DOWN) {
-////                        home_Call.requestFocus();
-//                        back true;
-//                    } else if (keyCode == KeyEvent.KEYCODE_DPAD_RIGHT){
-//
-//                    }else if (keyCode == KeyEvent.KEYCODE_DPAD_UP) {
-////                        home_Contacts.requestFocus();
-//                        back true;
-//                    }
-//                    break;
-//            }
-//        }
-//        back false;
-//    }
+
     @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
@@ -245,24 +218,108 @@ public class HomeActivity extends FragmentActivity implements ViewPager.OnPageCh
             case R.id.home_atth_rl:
                 setFragment(2);
                 break;
+            case R.id.home_bg_rl:
+                setFragment(3);
+                break;
         }
     }
 
     private void setButtonSelector() {
     }
-
+    @Override
+    public boolean onKey(View v, int keyCode, KeyEvent event) {
+        if (event.getAction() == KeyEvent.ACTION_DOWN) {
+            switch (v.getId()){
+                //home_call_rl,home_contacts_rl,home_atth_rl
+                case R.id.home_call_rl:
+                    if (keyCode == KeyEvent.KEYCODE_DPAD_RIGHT){
+                        home_contacts_rl.setFocusable(false);
+                        home_atth_rl.setFocusable(false);
+                        home_bg_rl.setFocusable(false);
+                        return false;
+                    }
+//                    if (keyCode == KeyEvent.KEYCODE_DPAD_DOWN) {
+//                        home_call_rl.requestFocus();
+//                            return true;
+//                    } else if (keyCode == KeyEvent.KEYCODE_DPAD_RIGHT){
+//
+//                    }else if (keyCode == KeyEvent.KEYCODE_DPAD_UP) {
+//                            home_atth_rl.requestFocus();
+//                            return true;
+//                    }
+                    break;
+                case R.id.home_contacts_rl:
+                    if (keyCode == KeyEvent.KEYCODE_DPAD_RIGHT){
+                        home_call_rl.setFocusable(false);
+                        home_atth_rl.setFocusable(false);
+                        home_bg_rl.setFocusable(false);
+                        return false;
+                    }
+//                    if (keyCode == KeyEvent.KEYCODE_DPAD_DOWN) {
+//                            home_atth_rl.requestFocus();
+//                        return true;
+//                    } else if (keyCode == KeyEvent.KEYCODE_DPAD_RIGHT){
+//
+//                    }else if (keyCode == KeyEvent.KEYCODE_DPAD_UP) {
+//                            home_call_rl.requestFocus();
+//                        return true;
+//                    }
+                    break;
+                case R.id.home_atth_rl:
+                    if (keyCode == KeyEvent.KEYCODE_DPAD_RIGHT){
+                        home_contacts_rl.setFocusable(false);
+                        home_call_rl.setFocusable(false);
+                        home_bg_rl.setFocusable(false);
+                        return false;
+                    }
+//                    if (keyCode == KeyEvent.KEYCODE_DPAD_DOWN) {
+//                        home_call_rl.requestFocus();
+//                        return true;
+//                    } else if (keyCode == KeyEvent.KEYCODE_DPAD_RIGHT){
+//
+//                    }else if (keyCode == KeyEvent.KEYCODE_DPAD_UP) {
+//                        home_contacts_rl.requestFocus();
+//                        return true;
+//                    }
+                    break;
+                case R.id.home_bg_rl:
+                    if (keyCode == KeyEvent.KEYCODE_DPAD_RIGHT){
+                        home_contacts_rl.setFocusable(false);
+                        home_call_rl.setFocusable(false);
+                        home_atth_rl.setFocusable(false);
+                    }
+                    break;
+            }
+        }
+        return false;
+    }
     @Override
     public void onFocusChange(View v, boolean hasFocus) {
         if (hasFocus){
             switch (v.getId()){
                 case R.id.home_call_rl:
-
+                    setFragment(0);
+                    home_contacts_rl.setFocusable(true);
+                    home_atth_rl.setFocusable(true);
+                    home_bg_rl.setFocusable(true);
                     break;
                 case R.id.home_contacts_rl:
-
+                    setFragment(1);
+                    home_call_rl.setFocusable(true);
+                    home_atth_rl.setFocusable(true);
+                    home_bg_rl.setFocusable(true);
                     break;
                 case R.id.home_atth_rl:
-
+                    setFragment(2);
+                    home_call_rl.setFocusable(true);
+                    home_contacts_rl.setFocusable(true);
+                    home_bg_rl.setFocusable(true);
+                    break;
+                case R.id.home_bg_rl:
+                    setFragment(3);
+                    home_call_rl.setFocusable(true);
+                    home_contacts_rl.setFocusable(true);
+                    home_atth_rl.setFocusable(true);
                     break;
             }
         }else{
@@ -274,6 +331,9 @@ public class HomeActivity extends FragmentActivity implements ViewPager.OnPageCh
 
                     break;
                 case R.id.home_atth_rl:
+
+                    break;
+                case R.id.home_bg_rl:
 
                     break;
             }

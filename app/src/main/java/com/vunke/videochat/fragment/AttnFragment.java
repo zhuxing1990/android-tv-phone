@@ -44,6 +44,11 @@ public class AttnFragment extends Fragment {
         super.onCreate(savedInstanceState);
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.i(TAG, "onResume: ");
+    }
 
     private RecyclerView attn_recycler;
     private AttnAdapter attnAdapter;
@@ -63,6 +68,7 @@ public class AttnFragment extends Fragment {
         callRecordReceiver = new CallRecordReceiver(new CallRecordCallBack() {
             @Override
             public void onUpdate() {
+                Log.i(TAG, "Attn onUpdate: ");
                 initData();
             }
         });
@@ -119,7 +125,8 @@ public class AttnFragment extends Fragment {
     private DisposableObserver<List<CallRecord>> disposableObserver;
     private void initAttnData(final List<CallRecord> callRecordList) {
         Log.i(TAG, "initAttnData: ");
-        final List<Contacts> contacts = ContactsDao.Companion.getInstance(getActivity()).queryAll();
+//        final List<Contacts> contacts = ContactsDao.Companion.getInstance(getActivity()).queryAll();//------------------数据库更新
+        final List<Contacts> contacts = ContactsDao.Companion.getInstance(getActivity()).queryAll(getActivity());;
         if (contacts!=null&&contacts.size()!=0){
             disposedObserver();
             disposableObserver = new DisposableObserver<List<CallRecord>>() {
@@ -157,6 +164,7 @@ public class AttnFragment extends Fragment {
                                     Log.i(TAG, "initAttnData: get name success:"+contact.getUser_name());
                                     callRecord.setCall_name(contact.getUser_name());
                                 }
+                                callRecord.setCall_id(contact.get_id());
                             }
                         }
                         emitter.onNext(callRecordList);

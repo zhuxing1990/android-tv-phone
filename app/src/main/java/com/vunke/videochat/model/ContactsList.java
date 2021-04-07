@@ -108,7 +108,7 @@ public class ContactsList {
             private String fliId;
             private String friendsName;
             private String friendsNumber;
-            private int id;
+            private long id;
 
             public String getFliId() {
                 return fliId;
@@ -134,11 +134,11 @@ public class ContactsList {
                 this.friendsNumber = friendsNumber;
             }
 
-            public int getId() {
+            public long getId() {
                 return id;
             }
 
-            public void setId(int id) {
+            public void setId(long id) {
                 this.id = id;
             }
         }

@@ -1,10 +1,13 @@
 package com.vunke.videochat.ui;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 
 import com.vunke.videochat.R;
+import com.vunke.videochat.base.BaseConfig;
+import com.vunke.videochat.db.Contacts;
 
 /**
  * Created by zhuxi on 2020/8/29.
@@ -24,4 +27,6 @@ public class WelcomeActivity extends AppCompatActivity {
 //                    }
 //                });
     }
+
+
 }

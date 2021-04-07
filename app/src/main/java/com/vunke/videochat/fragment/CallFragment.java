@@ -25,6 +25,7 @@ import android.widget.Toast;
 import com.vunke.videochat.R;
 import com.vunke.videochat.base.BaseConfig;
 import com.vunke.videochat.callback.RegisterCallBack;
+import com.vunke.videochat.dialog.MyDialog;
 import com.vunke.videochat.dialog.NotCameraDialog;
 import com.vunke.videochat.login.LoginCallBack;
 import com.vunke.videochat.login.LoginManage;
@@ -36,6 +37,7 @@ import com.vunke.videochat.receiver.RegisterReceiver;
 import com.vunke.videochat.service.LinphoneMiniManager;
 import com.vunke.videochat.tools.FocusUtil;
 import com.vunke.videochat.tools.SPUtils;
+import com.vunke.videochat.tools.Utils;
 import com.vunke.videochat.ui.HomeActivity;
 import com.vunke.videochat.ui.OrderActivity;
 import com.vunke.videochat.ui.ProductDesActivity;
@@ -72,9 +74,18 @@ public class CallFragment extends Fragment implements View.OnClickListener {
         initView(view);
         registerBroad();
         initLogin();
+        initDes();
         return view;
     }
-    private boolean isLogin;
+
+    private void initDes() {
+        int showDes = SPUtils.getInt(getActivity(), "showDes", 0);
+        if (showDes!=Utils.getVersionCode(getActivity())){
+            SPUtils.putInt(getActivity(), "showDes",Utils.getVersionCode(getActivity()));
+            goProductDes();
+        }
+    }
+
     private long reLoginTimes = 0L;
     private Handler handler = new Handler(){
         @Override
@@ -88,7 +99,23 @@ public class CallFragment extends Fragment implements View.OnClickListener {
         }
     };
 
-    private void stratLogin(String userName,String passWord) {
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.i(TAG, "onResume: ");
+        instance = LinphoneMiniManager.getInstance();
+        if (instance!=null){
+            boolean login = instance.isLogin();
+            if (!login){
+                initLogin();
+            }
+        }
+//        if (!isLogin){
+//            initLogin();
+//        }
+    }
+
+    private void stratLogin(String userName, String passWord) {
         try {
             RegisterManage.Login(getActivity(),userName,passWord);
         }catch (Exception e){
@@ -118,13 +145,12 @@ public class CallFragment extends Fragment implements View.OnClickListener {
             public void onSuccess() {
 //                Toast.makeText(HomeActivity.this,"登录成功",Toast.LENGTH_SHORT).show();
                 Log.i(TAG, "registerBroad longin onSuccess: ");
-                isLogin = true;
+                ((HomeActivity) getActivity()).home_call_rl.requestFocus();
             }
 
             @Override
             public void onFailed(String message) {
                 Log.i(TAG, "registerBroad login onFailed: "+message);
-                isLogin = false;
                 if (message.contains("Busy Here")||message.contains("Forbidden")||message.contains("io error")){
                     if (System.currentTimeMillis()-reLoginTimes>30000){
                         Log.i(TAG, "registerBroad onFailed: start relogin");
@@ -269,22 +295,13 @@ public class CallFragment extends Fragment implements View.OnClickListener {
                 DelNumber(PhoneNumber);
                 break;
             case R.id.call_call_audio:
-                if (isLogin == true){
-                    startCall(false);
-                }else{
-                    Toast.makeText(getActivity(),"正在登录中,请稍候再试!",Toast.LENGTH_SHORT).show();
-                    initLogin();
-                }
+                initCall(false);
                 break;
             case R.id.call_call_video:
-                if (isLogin == true) {
-                    startCall(true);
-                }else{
-                    Toast.makeText(getActivity(),"正在登录中,请稍候再试!",Toast.LENGTH_SHORT).show();
-                    initLogin();
-                }
+                initCall(true);
                 break;
             case R.id.call_product_des:
+                ProductDesisShow = false;
                 goProductDes();
                 break;
             default:
@@ -292,9 +309,45 @@ public class CallFragment extends Fragment implements View.OnClickListener {
         }
     }
 
+    private void initCall(boolean b) {
+        boolean login = instance.isLogin();
+        if (login == true) {
+            startCall(b);
+        } else {
+            initLogin();
+//            String phoneNunber = SPUtils.getString(getActivity(), userInfoUtil.getUserId(), "");
+//            if (!TextUtils.isEmpty(phoneNunber)) {
+//                initDialog( "开通失败，请拨打4009900901,人工开通.");
+//            } else {
+                Toast.makeText(getActivity(), "正在登录中,请稍候再试!", Toast.LENGTH_SHORT).show();
+//            }
+        }
+    }
+    private  MyDialog mydialog;
+    private  void initDialog(String message) {
+        CancelDialog();
+        mydialog = new MyDialog(getActivity());
+        mydialog.setMessage(message);
+        mydialog.setCommitOnClickLintener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mydialog.cancel();
+            }
+        });
+        mydialog.show();
+    }
+    private  void CancelDialog(){
+        if (mydialog!=null){
+            mydialog.cancel();
+        }
+    }
+    private boolean ProductDesisShow = false;
     private void goProductDes() {
-       Intent intent = new Intent(getActivity(), ProductDesActivity.class);
-        startActivity(intent);
+        if (ProductDesisShow==false){
+            ProductDesisShow = true;
+            Intent intent = new Intent(getActivity(), ProductDesActivity.class);
+            startActivity(intent);
+        }
     }
 
     private void ShowOpenView() {
@@ -303,9 +356,7 @@ public class CallFragment extends Fragment implements View.OnClickListener {
     }
 
     private void DelNumber(String phoneNumber) {
-        if (TextUtils.isEmpty(phoneNumber)) {
-
-        } else{
+        if (!TextUtils.isEmpty(phoneNumber)) {
             StringBuffer buffer = new StringBuffer(phoneNumber);
             buffer.deleteCharAt(buffer.length() - 1);
             call_edit_num.setText(buffer.toString().trim());
@@ -327,7 +378,7 @@ public class CallFragment extends Fragment implements View.OnClickListener {
             Log.i(TAG,"get camera number:"+numberOfCameras);
             if (numberOfCameras==0){
                 dialog =  new NotCameraDialog(getActivity());
-                dialog .show();
+                dialog .Builder(getActivity()).show();
             }else{
                 Log.i(TAG, "onClick: startCall:"+str);
                 SPUtils.putString(getActivity(), BaseConfig.lastCallNumber,str);
@@ -368,23 +419,44 @@ public class CallFragment extends Fragment implements View.OnClickListener {
                         call_username.setText("本机号码:0"+userName);
                     }
                     passWord = loginInfo.getData().getPassword();
-                    if(!LinphoneMiniManager.isReady()){
-                        instance = LinphoneMiniManager.getInstance();
+                    instance = LinphoneMiniManager.getInstance();
+                    if (instance!=null){
+                        boolean login = instance.isLogin();
+                        if (!login){
+                            Log.i(TAG, "onSuccess: not login ,start login1");
+                            stratLogin(userName,passWord);
+                            call_openforuse.setVisibility(View.GONE);
+                        }else{
+                            Log.i(TAG, "onSuccess: is login,don't login");
+                            call_openforuse.setVisibility(View.GONE);
+                        }
+                    }else{
+                        Log.i(TAG, "onSuccess: not login ,start login2");
+                        stratLogin(userName,passWord);
+                        call_openforuse.setVisibility(View.GONE);
                     }
-                    stratLogin(userName,passWord);
-                    call_openforuse.setVisibility(View.GONE);
+                    ((HomeActivity) getActivity()).home_call_rl.requestFocus();
                 }
 
                 @Override
                 public void onFailed(LoginInfo loginInfo) {
                     // 获取用户信息失败，无法登录
+                    goProductDes();
                     Log.i(TAG, "onSuccess: get loginInfo failed");
 //                    call_login_status.setText("获取登陆信息失败:"+loginInfo.getMessage());
-                    call_username.setText("您尚未开通此产品");
-                    if (call_openforuse.getVisibility() !=View.VISIBLE){
-                        call_openforuse.setVisibility(View.VISIBLE);
+                    String phoneNunber = SPUtils.getString(getActivity(),userInfoUtil.getUserId(),"");
+                    if (!TextUtils.isEmpty(phoneNunber)){
+                        call_username.setText("0"+phoneNunber+"开通失败，请拨打4009900901,人工开通.");
+                        if (call_openforuse.getVisibility() ==View.VISIBLE){
+                            call_openforuse.setVisibility(View.INVISIBLE);
+                        }
+                    }else {
+                        call_username.setText("您尚未开通此产品");
+                        if (call_openforuse.getVisibility() !=View.VISIBLE){
+                            call_openforuse.setVisibility(View.VISIBLE);
+                        }
+                        call_openforuse.requestFocus();
                     }
-                    call_openforuse.requestFocus();
 //                    Intent intent = new Intent(getActivity(), WelcomeActivity.class);
 //                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 //                    startActivity(intent);
@@ -487,6 +559,7 @@ public class CallFragment extends Fragment implements View.OnClickListener {
             if (openReceiver!=null){
                 getActivity().unregisterReceiver(openReceiver);
             }
+            CancelDialog();
         }catch (Exception e){
             e.printStackTrace();
         }

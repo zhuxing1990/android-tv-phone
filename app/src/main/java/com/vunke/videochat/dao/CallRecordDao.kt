@@ -168,4 +168,5 @@ class CallRecordDao(context: Context) {
         }
         return count
     }
+
 }

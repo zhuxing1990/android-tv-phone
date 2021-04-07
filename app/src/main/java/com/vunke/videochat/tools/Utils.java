@@ -11,6 +11,8 @@ import android.util.Log;
 import android.widget.Button;
 
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -142,4 +144,47 @@ public class Utils {
         };
         longObservable.subscribe(disposableObserver);
     }
+
+    public static boolean isNumeric(String str){
+        Pattern pattern = Pattern.compile("[0-9]*");
+        Matcher isNum = pattern.matcher(str);
+        if( !isNum.matches() ){
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * @param context
+     * @return versionName 版本名字
+     */
+    public static String getVersionName(Context context) {
+        String versionName = "";
+        try {
+            String pkName = context.getPackageName();
+            versionName = context.getPackageManager().getPackageInfo(
+                    pkName, 0).versionName;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "0";
+        }
+        return versionName;
+    }
+    /**
+     * @param context
+     * @return versionCode 版本号
+     */
+    public static int getVersionCode(Context context) {
+        int versionCode = 0;
+        try {
+            String pkName = context.getPackageName();
+            versionCode = context.getPackageManager()
+                    .getPackageInfo(pkName, 0).versionCode;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+        return versionCode;
+    }
+
 }

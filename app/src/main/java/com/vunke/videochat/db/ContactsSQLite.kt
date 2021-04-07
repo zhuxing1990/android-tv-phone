@@ -13,7 +13,7 @@ class ContactsSQLite(context :Context?):ManagedSQLiteOpenHelper(context!!, DATAB
     var TAG = "ContactsSQLite"
     companion object {
         val DATABASE_NAME = "attn.db"
-        val DATABASE_VERSION = 2
+        val DATABASE_VERSION = 3
         private var instance : ContactsSQLite? = null
         @Synchronized
         fun getInstance(context: Context) : ContactsSQLite {
@@ -38,7 +38,7 @@ class ContactsSQLite(context :Context?):ManagedSQLiteOpenHelper(context!!, DATAB
         try {
             db!!.createTable(
                     ContactsTable.TABLE_NAME,true,
-                    ContactsTable._ID to INTEGER + PRIMARY_KEY + AUTOINCREMENT,
+                    ContactsTable._ID to INTEGER + PRIMARY_KEY ,
                     ContactsTable.USER_NAME to TEXT,
                     ContactsTable.PHONE to TEXT
             )

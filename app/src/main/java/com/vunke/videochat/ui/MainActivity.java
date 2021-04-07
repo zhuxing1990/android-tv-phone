@@ -22,6 +22,7 @@ import com.vunke.videochat.manage.CallManage;
 import com.vunke.videochat.manage.RegisterManage;
 import com.vunke.videochat.service.LinphoneMiniManager;
 import com.vunke.videochat.tools.FocusUtil;
+import com.vunke.videochat.tools.LinphoneMiniUtils;
 import com.vunke.videochat.tools.SPUtils;
 
 import java.util.concurrent.TimeUnit;
@@ -51,6 +52,7 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        LinphoneMiniUtils.initLinphoneService(this);
         registerBroad();
         initView();
     }
@@ -215,8 +217,18 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
 //            String userName = "7318478702102";
 //            String password = "11223355";
 
-            String userName = "73184310085";
-            String password = "y5427ln4";
+//            String userName = "73184310085";
+//            String password = "y5427ln4";
+//            String userName = "73257120251";
+//            String password = "8HTG0BvT";
+//            String userName = "7393710188";
+//            String password = "u3AB63LR";
+            //73152324252  V8lMAD8d
+//            7354427957   rz4k6vYz
+//            String userName = "7352227923";
+//            String password = "UUAoe4OJ";
+            String userName = "7354427957";
+            String password = "rz4k6vYz";
             RegisterManage.Login(MainActivity.this,userName,password);
         }catch (Exception e){
             e.printStackTrace();

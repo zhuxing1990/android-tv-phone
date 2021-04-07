@@ -8,4 +8,5 @@ class CallRecord {
     lateinit var call_name :String
     lateinit var call_time :String
     lateinit var call_status :String
+    var call_id:Long=0
 }

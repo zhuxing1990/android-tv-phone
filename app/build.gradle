@@ -10,8 +10,8 @@ android {
         applicationId "com.vunke.videochat"
         minSdkVersion 19
         targetSdkVersion 26
-        versionCode 40
-        versionName "40.0"
+        versionCode 56
+        versionName "56.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -33,7 +33,7 @@ android {
                     }
             }
         }
-    }
+}
     sourceSets {
         main {
             jniLibs.srcDirs = ['libs']
@@ -72,7 +72,8 @@ dependencies {
     implementation 'com.lzy.net:okserver:+'
     //gson
     implementation 'com.google.code.gson:gson:2.8.2'
-
+    //zxing 二维码
+    implementation 'com.google.zxing:core:3.4.1'
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'

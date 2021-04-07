@@ -4,9 +4,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-        <SurfaceView
-            android:id="@+id/test_surface"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
+      <Button
+          android:id="@+id/test_but"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="测试绑定号码"/>
 </RelativeLayout>

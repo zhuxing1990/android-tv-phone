@@ -13,22 +13,18 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.vunke.videochat.R;
 import com.vunke.videochat.config.CallInfo;
 import com.vunke.videochat.dao.CallRecordDao;
-import com.vunke.videochat.dao.ContactsDao;
 import com.vunke.videochat.db.CallRecord;
-import com.vunke.videochat.db.Contacts;
-import com.vunke.videochat.dialog.AddContactsDialog;
+import com.vunke.videochat.db.ContactsTable;
 import com.vunke.videochat.dialog.CallRecordDialog;
 import com.vunke.videochat.dialog.NotCameraDialog;
 import com.vunke.videochat.manage.CallManage;
-import com.vunke.videochat.receiver.CallRecordReceiver;
-import com.vunke.videochat.receiver.ContactsReceiver;
 import com.vunke.videochat.tools.TimeUtil;
 import com.vunke.videochat.tools.Utils;
+import com.vunke.videochat.ui.AddContactActivity;
 
 import java.util.List;
 
@@ -184,62 +180,77 @@ public class AttnAdapter extends RecyclerView.Adapter<AttnAdapter.AttnHolder> {
             public void onClick(View v) {
                 String phone = list.get(position).getCall_phone();
                 String name = list.get(position).getCall_name();
-                AddContact(phone,name);
+                long id = list.get(position).getCall_id();
+                AddContact(phone,name,id);
                 callRecordDialog.cancel();
             }
         });
     }
-    private AddContactsDialog dialog;
-    private void AddContact(String phone,String name) {
-        if (dialog!=null&&dialog.isShowing()){
-            dialog.cancel();
+//    private AddContactsDialog dialog;
+    private void AddContact(String phone,String name,Long id) {
+        Intent intent = new Intent(context, AddContactActivity.class);
+        if (!name.equals(phone)){
+            intent.putExtra(ContactsTable.INSTANCE.getUSER_NAME(),name);
         }
-        dialog = new AddContactsDialog(context).builder();
-        dialog.setPhoenEdit(phone);
-        dialog.setNameEdit(name);
-        dialog.setPositiveButton("", new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String name = dialog.getNameEdit().toString();
-                String phone = dialog.getPhoenEdit().toString();
-                if (TextUtils.isEmpty(name)){
-                    Toast.makeText(context,"请输入姓名",Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                if (TextUtils.isEmpty(phone)){
-                    Toast.makeText(context,"请输入号码",Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                Contacts contacts = new Contacts();
-                contacts.setUser_name(name);
-                contacts.setPhone(phone);
-                Long i = ContactsDao.Companion.getInstance(context).saveData(contacts);
-                if (i!=-1L){
-                    Toast.makeText(context,"保存成功",Toast.LENGTH_SHORT).show();
-                    dialog.cancel();
-                    try {
-                        Intent intent = new Intent();
-                        intent.setAction(ContactsReceiver.CONTACTS_ADD_ACTION);
-                        context.sendBroadcast(intent);
-                        Intent intent2 = new Intent();
-                        intent2.setAction(CallRecordReceiver.CALL_RECORD_ACTION);
-                        context.sendBroadcast(intent2);
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }else {
-                    Toast.makeText(context,"保存失败",Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-        dialog.setNeutralButton("", new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.cancel();
-            }
-        });
-        dialog.setCancelable(false);
-        dialog.show();
+        if (0!=id){
+            intent.putExtra(ContactsTable.INSTANCE.get_ID(),id);
+        }
+        intent.putExtra(ContactsTable.INSTANCE.getPHONE(),phone);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        context.startActivity(intent);
+//        if (dialog!=null&&dialog.isShowing()){
+//            dialog.cancel();
+//        }
+//        dialog = new AddContactsDialog(context).builder();
+//        dialog.setPhoenEdit(phone);
+//        dialog.setNameEdit(name);
+//        dialog.setPositiveButton("", new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                String name = dialog.getNameEdit().toString();
+//                String phone = dialog.getPhoenEdit().toString();
+//                if (TextUtils.isEmpty(name)){
+//                    Toast.makeText(context,"请输入姓名",Toast.LENGTH_SHORT).show();
+//                    return;
+//                }
+//                if (TextUtils.isEmpty(phone)){
+//                    Toast.makeText(context,"请输入号码",Toast.LENGTH_SHORT).show();
+//                    return;
+//                }
+//                if (!Utils.isNumeric(phone)){
+//                    Toast.makeText(context,"号码请输入数字",Toast.LENGTH_SHORT).show();
+//                    return;
+//                }
+//                Contacts contacts = new Contacts();
+//                contacts.setUser_name(name);
+//                contacts.setPhone(phone);
+//                Long i = ContactsDao.Companion.getInstance(context).saveData(contacts);
+//                if (i!=-1L){
+//                    Toast.makeText(context,"保存成功",Toast.LENGTH_SHORT).show();
+//                    dialog.cancel();
+//                    try {
+//                        Intent intent = new Intent();
+//                        intent.setAction(ContactsReceiver.CONTACTS_ADD_ACTION);
+//                        context.sendBroadcast(intent);
+//                        Intent intent2 = new Intent();
+//                        intent2.setAction(CallRecordReceiver.CALL_RECORD_ACTION);
+//                        context.sendBroadcast(intent2);
+//                    }catch (Exception e){
+//                        e.printStackTrace();
+//                    }
+//                }else {
+//                    Toast.makeText(context,"保存失败",Toast.LENGTH_SHORT).show();
+//                }
+//            }
+//        });
+//        dialog.setNeutralButton("", new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                dialog.cancel();
+//            }
+//        });
+//        dialog.setCancelable(false);
+//        dialog.show();
     }
     @Override
     public int getItemCount() {

@@ -56,7 +56,18 @@ public class OrderActivity extends AppCompatActivity {
                                             String certNum = js.getString("certNum");
                                             String custName = js.getString("custName");
                                             order_username.setText(custName);
-                                            order_usercard.setText(certNum.substring(certNum.length()-4));
+                                           if (!TextUtils.isEmpty(certNum)){
+                                               try {
+                                                   if (certNum.length()==18){
+                                                       String substring = certNum.substring(certNum.length() - 8,certNum.length() - 4);
+                                                       String str = certNum.replace(substring,"****");
+                                                       order_usercard.setText(str);
+                                                   }
+                                               }catch (Exception e){
+                                                   e.printStackTrace();
+                                                   order_usercard.setText(certNum);
+                                               }
+                                           }
                                         }else{
                                             if (js.has("message")){
                                                 String message = js.getString("message");
