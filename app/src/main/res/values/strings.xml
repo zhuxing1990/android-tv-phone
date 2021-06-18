@@ -30,10 +30,11 @@
     <!--<string name="call_rate">本产品无月租费，通话产生的费用根据实际使用情况收取</string>-->
     <!--<string name="call_rate">产品资费:电视电话包月，月租费0元/月。通话费按当地固话收费标准，根据每月实际使用情况收取。来电显示功能费0元/月，2021年2月1日起5元/月。</string>-->
     <string name="call_rate">产品资费：通话费按固话收费标准收取</string>
-    <string name="open_des">用户信息：姓名</string>
+    <string name="open_des">用户信息验证</string>
     <!--<string name="open_des">电视电话开通后,话费将产生在:</string>-->
-    <string name="card_des">，身份证号：</string>
+    <string name="card_des">身份证号：</string>
+    <string name="user_name">用户姓名：</string>
     <!--<string name="card_des">,身份证后四位</string>-->
-    <string name="call_rate_des">的用户话单中</string>
     <string name="qrcode_to_add">用手机扫码录入联系人\n更方便哦~</string>
+    <string name="input_user_card">(请将身份证后4位补充完整)</string>
 </resources>

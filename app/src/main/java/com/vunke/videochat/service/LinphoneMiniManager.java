@@ -87,6 +87,7 @@ import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 
 public class LinphoneMiniManager extends Service implements LinphoneCoreListener {
+	private static final String TAG = "Linphone";
 	private static LinphoneMiniManager mInstance;
 	private Context mContext;
 	private LinphoneCore mLinphoneCore;
@@ -120,7 +121,8 @@ public class LinphoneMiniManager extends Service implements LinphoneCoreListener
 
 		mContext = this;
 		lcFactory = LinphoneCoreFactory.instance();
-		lcFactory.setDebugMode(true, "Linphone");
+		lcFactory.setDebugMode(true, TAG);
+//		lcFactory.setLogCollectionPath(Environment.getExternalStorageDirectory().getAbsolutePath()+File.separator+"vunke"+File.separator+"videochat"+File.separator);
 		try {
 			String basePath = mContext.getFilesDir().getAbsolutePath();
 			copyAssetsFromPackage(basePath);
@@ -129,19 +131,36 @@ public class LinphoneMiniManager extends Service implements LinphoneCoreListener
 			setUserAgent();
 			startIterate();
 			mInstance = this;
-//			String[] dnsServer = new String[]{"8.8.8.8"};
-			//mLinphoneCore.setDnsServers( dnsServer );
-//			mLinphoneCore.setPreferredVideoSizeByName("640p");
-			mLinphoneCore.setPreferredVideoSize(VideoSize.VIDEO_SIZE_QVGA);
-			mLinphoneCore.setPreferredFramerate(24);
 
+//			mLinphoneCore.getConfig().setInt("audio", "codec_bitrate_limit", 128);
+			float preferredFramerate = mLinphoneCore.getPreferredFramerate();
+			Log.i(TAG, "onCreate: 视频帧速率:"+preferredFramerate);
+			int uploadBandwidth = mLinphoneCore.getUploadBandwidth();
+			Log.i(TAG, "onCreate: 最大可用上传带宽:"+uploadBandwidth+"/秒");
+			int downloadBandwidth = mLinphoneCore.getDownloadBandwidth();
+			Log.i(TAG, "onCreate: 最大可用下载带宽"+downloadBandwidth+"/秒");
+			String[] supportedVideoSizes = mLinphoneCore.getSupportedVideoSizes();
+			for (String str:supportedVideoSizes){
+				Log.i(TAG, "onCreate: 支持的视频分辨率:"+str);
+//				if (str.contains("720p")){
+//					mLinphoneCore.setPreferredVideoSize(VideoSize.VIDEO_SIZE_720P);
+//				}else if (str.contains("1020p")){
+//					mLinphoneCore.setPreferredVideoSize(VideoSize.VIDEO_SIZE_1020P);
+//				}
+			}
+//			mLinphoneCore.setPreferredVideoSize(VideoSize.VIDEO_SIZE_QVGA);
+			VideoSize preferredVideoSize = mLinphoneCore.getPreferredVideoSize();
+			Log.i(TAG, "onCreate: 获取视频分辨率:"+preferredVideoSize);
+//			mLinphoneCore.setPreferredVideoSize(VideoSize.VIDEO_SIZE_1020P);
+			// 默认的视频分辨率  320*240 不用设置
+//			mLinphoneCore. enableAdaptiveRateControl(true);//启用自适应速率控制
 //			mLinphoneCore.setPreferredVideoSizeByName("720p");
-//			mLinphoneCore.setPreferredVideoSize(VideoSize.VIDEO_SIZE_720P);
+
+
+			//audio 码率设置
+			//			mLinphoneCore.setPreferredFramerate(24);
 			//			mLinphoneCore.setPreferredFramerate(30);
 
-			mLinphoneCore. enableAdaptiveRateControl(true);//启用自适应速率控制
-			//audio 码率设置
-//			mLinphoneCore.getConfig().setInt("audio", "codec_bitrate_limit", 128);
 
 //			mLinphoneCore.setUploadBandwidth(1536);
 //			mLinphoneCore.setDownloadBandwidth(1536);
@@ -294,7 +313,6 @@ public class LinphoneMiniManager extends Service implements LinphoneCoreListener
 		LinphoneMiniUtils.copyFromPackage(mContext, R.raw.linphonerc_factory, new File(basePath + "/linphonerc").getName());
 		LinphoneMiniUtils.copyIfNotExist(mContext, R.raw.lpconfig, basePath + "/lpconfig.xsd");
 		LinphoneMiniUtils.copyIfNotExist(mContext, R.raw.rootca, basePath + "/rootca.pem");
-
 	}
 
 	private void initLinphoneCoreValues(String basePath) {
@@ -308,18 +326,18 @@ public class LinphoneMiniManager extends Service implements LinphoneCoreListener
 
 	@Override
 	public void authInfoRequested(LinphoneCore lc, String realm, String username, String domain) {
-		Log.e("提示","lilin authInfoRequested: "+username  );
+		Log.e(TAG,"提示:lilin authInfoRequested: "+username  );
 	}
 
 	@Override
 	public void globalState(LinphoneCore lc, GlobalState state, String message) {
-		Log.e("提示","lilin Global state: " + state + "(" + message + ")");
+		Log.e(TAG,"提示:lilin Global state: " + state + "(" + message + ")");
 	}
 
 	@Override
 	public void callState(LinphoneCore lc, LinphoneCall call, State cstate,
                           String message) {
-		Log.d("提示","lilin Call state1: " + cstate + "(" + message + ")");
+		Log.d(TAG,"提示:lilin Call state1: " + cstate + "(" + message + ")");
 		if (message.contains("Call released")){
 			Intent intent1 = new Intent(BaseConfig.INSTANCE.getRECEIVE_MAIN_ACTIVITY());
 			intent1.putExtra("action", "show_status");intent1.putExtra("data", message );
@@ -340,7 +358,7 @@ public class LinphoneMiniManager extends Service implements LinphoneCoreListener
 	@Override
 	public void callEncryptionChanged(LinphoneCore lc, LinphoneCall call,
                                       boolean encrypted, String authenticationToken) {
-		Log.e("提示","lilin  callEncryptionChanged: " );
+		Log.e(TAG,"提示:lilin  callEncryptionChanged: " );
 	}
 	private boolean isLogin = false;
 
@@ -376,7 +394,7 @@ public class LinphoneMiniManager extends Service implements LinphoneCoreListener
 			}
 			str+="\n";
 			for (final PayloadType payloadType : mLinphoneCore.getVideoCodecs()) {
-				Log.i("PayloadType", "payloadType.getMine: "+payloadType.getMime());
+				Log.i(TAG, "payloadType.getMine: "+payloadType.getMime());
 				if(payloadType.getMime().equalsIgnoreCase("VP8")){
 					Log.i("getPayloadType", "payloadType:VP8");
 					try {
@@ -385,7 +403,7 @@ public class LinphoneMiniManager extends Service implements LinphoneCoreListener
 						Log.e("","》》》》》》》》》》》》");
 					}
 				}else if (payloadType.getMime().equalsIgnoreCase("H264")){
-					Log.i("getPayloadType", "payloadType:H264");
+					Log.i(TAG, "payloadType:H264");
 					if (lc.downloadOpenH264Enabled()) {
 						final CheckBoxPreference codec = new CheckBoxPreference(mContext);
 						codec.setTitle(payloadType.getMime());
@@ -395,7 +413,7 @@ public class LinphoneMiniManager extends Service implements LinphoneCoreListener
 						}
 						codec.setChecked(lc.isPayloadTypeEnabled(payloadType));
 					}else{
-						Log.i("getPayloadType", "lc can't open H264: ");
+						Log.i(TAG, "lc can't open H264: ");
 					}
 				}
 				str+=payloadType.getMime()+"("+mLinphoneCore.isPayloadTypeEnabled( payloadType )+")<>";
@@ -411,36 +429,36 @@ public class LinphoneMiniManager extends Service implements LinphoneCoreListener
 	@Override
 	public void newSubscriptionRequest(LinphoneCore lc, LinphoneFriend lf,
                                        String url) {
-		Log.e("提示","lilin  newSubscriptionRequest: " );
+		Log.e(TAG,"提示:lilin  newSubscriptionRequest: " );
 	}
 
 	@Override
 	public void notifyPresenceReceived(LinphoneCore lc, LinphoneFriend lf) {
-		Log.e("提示","lilin  notifyPresenceReceived: " );
+		Log.e(TAG,"提示:lilin  notifyPresenceReceived: " );
 	}
 
 
 	@Override
 	public void messageReceived(LinphoneCore lc, LinphoneChatRoom cr,
                                 LinphoneChatMessage message) {
-		Log.e("提示","lilin  Message received from " + cr.getPeerAddress().asString() + " : " + message.getText() + "(" + message.getExternalBodyUrl() + ")");
+		Log.e(TAG,"提示:lilin  Message received from " + cr.getPeerAddress().asString() + " : " + message.getText() + "(" + message.getExternalBodyUrl() + ")");
 	}
 
 	@Override
 	public void isComposingReceived(LinphoneCore lc, LinphoneChatRoom cr) {
-		Log.e("提示","lilin Composing received from " + cr.getPeerAddress().asString());
+		Log.e(TAG,"提示:lilin Composing received from " + cr.getPeerAddress().asString());
 
 	}
 
 	@Override
 	public void dtmfReceived(LinphoneCore lc, LinphoneCall call, int dtmf) {
-		Log.e("提示","lilin  dtmfReceived: " );
+		Log.e(TAG,"提示:lilin  dtmfReceived: " );
 	}
 
 	@Override
 	public void ecCalibrationStatus(LinphoneCore lc, EcCalibratorStatus status,
                                     int delay_ms, Object data) {
-		Log.e("提示","lilin  ecCalibrationStatus: " );
+		Log.e(TAG,"提示:lilin  ecCalibrationStatus: " );
 		if (status == EcCalibratorStatus.InProgress) return;
 		mLinphoneCore.removeListener(this);
 		AudioManager mAudioManager = ((AudioManager)getSystemService(Context.AUDIO_SERVICE));
@@ -457,53 +475,53 @@ public class LinphoneMiniManager extends Service implements LinphoneCoreListener
 	@Override
 	public void notifyReceived(LinphoneCore lc, LinphoneCall call,
                                LinphoneAddress from, byte[] event) {
-		Log.e("提示","lilin  notifyReceived: " );
+		Log.e(TAG,"提示:lilin  notifyReceived: " );
 	}
 
 	@Override
 	public void transferState(LinphoneCore lc, LinphoneCall call,
                               State new_call_state) {
-		Log.e("提示","lilin  transferState: " );
+		Log.e(TAG,"提示:lilin  transferState: " );
 	}
 
 	@Override
 	public void infoReceived(LinphoneCore lc, LinphoneCall call,
                              LinphoneInfoMessage info) {
-		Log.e("提示","lilin  infoReceived: " );
+		Log.e(TAG,"提示:lilin  infoReceived: " );
 	}
 
 	@Override
 	public void subscriptionStateChanged(LinphoneCore lc, LinphoneEvent ev,
                                          SubscriptionState state) {
-		Log.e("提示","lilin  subscriptionStateChanged: " );
+		Log.e(TAG,"提示:lilin  subscriptionStateChanged: " );
 	}
 
 	@Override
 	public void notifyReceived(LinphoneCore lc, LinphoneEvent ev,
                                String eventName, LinphoneContent content) {
-		Log.e("提示","lilin Notify received: " + eventName + " -> " + content.getDataAsString());
+		Log.e(TAG,"提示:lilin Notify received: " + eventName + " -> " + content.getDataAsString());
 	}
 
 	@Override
 	public void publishStateChanged(LinphoneCore lc, LinphoneEvent ev,
                                     PublishState state) {
-		Log.e("提示","lilin  publishStateChanged: " );
+		Log.e(TAG,"提示:lilin  publishStateChanged: " );
 	}
 
 	@Override
 	public void configuringStatus(LinphoneCore lc,
                                   RemoteProvisioningState state, String message) {
-		Log.e("提示","lilin Configuration state: " + state + "(" + message + ")");
+		Log.e(TAG,"提示:lilin Configuration state: " + state + "(" + message + ")");
 	}
 
 	@Override
 	public void show(LinphoneCore lc) {
-		Log.e("提示","lilin  show: " );
+		Log.e(TAG,"提示:lilin  show: " );
 	}
 
 	@Override
 	public void displayStatus(LinphoneCore lc, String message) {
-		Log.e("提示","lilin  displayStatus: "+message );
+		Log.e(TAG,"提示:lilin  displayStatus: "+message );
 		Intent intent1 = new Intent(BaseConfig.INSTANCE.getRECEIVE_MAIN_ACTIVITY());
 		intent1.putExtra("action", "show_status");intent1.putExtra("data", message );
 		sendBroadcast( intent1);
@@ -582,19 +600,19 @@ public class LinphoneMiniManager extends Service implements LinphoneCoreListener
 	}
 	@Override
 	public void displayMessage(LinphoneCore lc, String message) {
-		Log.e("提示","lilin  displayMessage: " );
+		Log.e(TAG,"提示:lilin  displayMessage: " );
 	}
 
 	@Override
 	public void displayWarning(LinphoneCore lc, String message) {
-		Log.e("提示","lilin  displayWarning: " );
+		Log.e(TAG,"提示:lilin  displayWarning: "+message );
 	}
 
 	@Override
 	public void authenticationRequested(LinphoneCore arg0,
                                         LinphoneAuthInfo arg1, AuthMethod arg2) {
 		// TODO Auto-generated method stub
-		Log.e("提示","lilin  authenticationRequested: " );
+		Log.e(TAG,"提示:lilin  authenticationRequested: " );
 	}
 
 	@Override
@@ -640,20 +658,20 @@ public class LinphoneMiniManager extends Service implements LinphoneCoreListener
 	@Override
 	public void networkReachableChanged(LinphoneCore arg0, boolean arg1) {
 		// TODO Auto-generated method stub
-		Log.e("提示","lilin  networkReachableChanged: " );
+		Log.e(TAG,"提示:lilin  networkReachableChanged: " );
 	}
 
 	@Override
 	public void uploadProgressIndication(LinphoneCore arg0, int arg1, int arg2) {
 		// TODO Auto-generated method stub
-		Log.e("提示","lilin  uploadProgressIndication: " );
+		Log.e(TAG,"提示:lilin  uploadProgressIndication: " );
 	}
 
 	@Override
 	public void uploadStateChanged(LinphoneCore arg0,
                                    LogCollectionUploadState arg1, String arg2) {
 		// TODO Auto-generated method stub
-		Log.e("提示","lilin  uploadStateChanged: " );
+		Log.e(TAG,"提示:lilin  uploadStateChanged: " );
 	}
 
 
@@ -749,7 +767,7 @@ public class LinphoneMiniManager extends Service implements LinphoneCoreListener
 		}
 	}
 	public void lilin_jie() throws LinphoneCoreException  {
-		Log.i("提示","lilin_jie: ");
+		Log.i(TAG,"提示:lilin_jie: ");
 		//instance.getLC().setVideoPolicy(true, instance.getLC().getVideoAutoAcceptPolicy());/*设置初始话视频电话，设置了这个你拨号的时候就默认为使用视频发起通话了*/
 		//getLC().setVideoPolicy(getLC().getVideoAutoInitiatePolicy(), true);/*设置自动接听视频通话的请求，也就是说只要是视频通话来了，直接就接通，不用按键确定，这是我们的业务流，不用理会*/
 		/*这是允许视频通话，这个选了false就彻底不能接听或者拨打视频电话了*/
@@ -760,6 +778,12 @@ public class LinphoneMiniManager extends Service implements LinphoneCoreListener
 				if(  remoteParams != null && remoteParams.getVideoEnabled()){
 					Log.i("提示", "lilin_jie: 支持视频通话");
 					params.setVideoEnabled( true );
+				}
+				boolean videoSupported = getLC().isVideoSupported();
+				if (videoSupported){
+					Log.i(TAG, "提示:lilin_qie_updatecall: 对方支持视频通话");
+				}else{
+					Log.i(TAG, "提示:lilin_qie_updatecall: 对方不支持视频通话");
 				}
 				getLC().acceptCallWithParams(currentCall,params);
 			}
@@ -779,24 +803,36 @@ public class LinphoneMiniManager extends Service implements LinphoneCoreListener
 					Log.i("提示", "lilin_jie: 设置不支持视频通话");
 					params.setVideoEnabled(false);
 				}
+				boolean videoSupported = getLC().isVideoSupported();
+				if (videoSupported){
+					Log.i(TAG, "提示:lilin_qie_updatecall: 对方支持视频通话");
+				}else{
+					Log.i(TAG, "提示:lilin_qie_updatecall: 对方不支持视频通话");
+				}
 				getLC().updateCall(currentCall,params);
 			}
 	}
 	public boolean lilin_qie_updatecall(){
-		Log.i("提示", "lilin_qie: ");
+		Log.i("提示", "lilin_qie_updatecall: ");
 		boolean isVideo = false;
 		LinphoneCall currentCall = mLinphoneCore.getCurrentCall();
 		if (currentCall!=null){
 			LinphoneCallParams params = getLC().createCallParams(currentCall);
 			LinphoneCallParams remoteParams = currentCall.getRemoteParams();
 			try {
-				Log.i("提示", "lilin_qie: 接受另一端发起的呼叫修改 ");
+				Log.i("提示", "lilin_qie_updatecall: 接受另一端发起的呼叫修改 ");
 				mLinphoneCore.acceptCallUpdate(currentCall,params);
 				if (remoteParams!=null){
 					isVideo =remoteParams.getVideoEnabled();
-					Log.i("提示","lilin_qie:获取另一端设置是否支持视频："+isVideo);
+					Log.i(TAG,"提示:lilin_qie_updatecall:获取另一端设置是否支持视频："+isVideo);
 				}else{
-					Log.i("提示","lilin_qie:获取另一端发起的呼叫修改为空");
+					Log.i(TAG,"提示:lilin_qie_updatecall:获取另一端发起的呼叫修改为空");
+				}
+				boolean videoSupported = getLC().isVideoSupported();
+				if (videoSupported){
+					Log.i(TAG, "提示:lilin_qie_updatecall: 对方支持视频通话");
+				}else{
+					Log.i(TAG, "提示:lilin_qie_updatecall: 对方不支持视频通话");
 				}
 			}catch (LinphoneCoreException e){
 				e.printStackTrace();
@@ -815,7 +851,7 @@ public class LinphoneMiniManager extends Service implements LinphoneCoreListener
 	public void updateCall() {
 		LinphoneCall lCall = mLinphoneCore.getCurrentCall();
 		if (lCall == null) {
-			Log.e("提示","Trying to updateCall while not in call: doing nothing");
+			Log.e(TAG,"提示:Trying to updateCall while not in call: doing nothing");
 			return;
 		}
 		mLinphoneCore.updateCall(lCall,null);

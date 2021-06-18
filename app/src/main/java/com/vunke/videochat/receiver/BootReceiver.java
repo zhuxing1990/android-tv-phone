@@ -40,6 +40,7 @@ public class BootReceiver extends BroadcastReceiver {
                     public void onNext(Long aLong) {
                         LinphoneMiniUtils.initLinphoneService(context);
                         initLogin(context);
+                        LoginManage.upLoginStatus(context,0);
                         onComplete();
                     }
 

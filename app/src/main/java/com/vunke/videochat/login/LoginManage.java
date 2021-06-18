@@ -1,5 +1,6 @@
 package com.vunke.videochat.login;
 
+import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -27,7 +28,7 @@ public class LoginManage {
         try {
             JSONObject json = new JSONObject();
             json.put("userId",userId);
-            OkGo.<String>post(BaseConfig.BASE_URL+ BaseConfig.LOGIN).upJson(json)
+            OkGo.<String>post(BaseConfig.BASE_URL+ BaseConfig.LOGIN).upJson(json).tag(TAG)
             .execute(new StringCallback() {
                 @Override
                 public void onSuccess(Response<String> response) {
@@ -73,6 +74,29 @@ public class LoginManage {
             e.printStackTrace();
         }
     }
+    public static void upLoginStatus(Context context,int loginStatus){
+        UserInfoUtil userInfoUtil = UserInfoUtil.getInstance(context);
+        String userId = userInfoUtil.getUserId();
+        try {
+            JSONObject json = new JSONObject();
+            json.put("userAccount",userId);
+            json.put("loginStatus",loginStatus);
+            OkGo.<String>post(BaseConfig.BASE_URL+BaseConfig.ADD_ACCESS_LOG).upJson(json).tag(TAG).retryCount(2)
+                    .execute(new StringCallback() {
+                        @Override
+                        public void onSuccess(Response<String> response) {
+                            Log.i(TAG, "onSuccess: ");
+                        }
 
+                        @Override
+                        public void onError(Response<String> response) {
+                            super.onError(response);
+                            Log.i(TAG, "onError: ");
+                        }
+                    });
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
 }
 

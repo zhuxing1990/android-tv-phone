@@ -74,9 +74,12 @@ public class CallFragment extends Fragment implements View.OnClickListener {
         initView(view);
         registerBroad();
         initLogin();
+        uploadLoginStatus();
         initDes();
         return view;
     }
+
+
 
     private void initDes() {
         int showDes = SPUtils.getInt(getActivity(), "showDes", 0);
@@ -475,6 +478,9 @@ public class CallFragment extends Fragment implements View.OnClickListener {
         }
     }
 
+    private void uploadLoginStatus() {
+        LoginManage.upLoginStatus(getActivity(),1);
+    }
 
     private View.OnKeyListener keyListener = new View.OnKeyListener() {
 

@@ -16,16 +16,21 @@ import android.view.View
 import android.widget.Toast
 import com.vunke.videochat.R
 import com.vunke.videochat.base.BaseConfig
+import com.vunke.videochat.callback.TalkCallBack
 import com.vunke.videochat.config.CallInfo
 import com.vunke.videochat.dao.ContactsDao
 import com.vunke.videochat.db.CallRecord
 import com.vunke.videochat.db.CallRecordTable
 import com.vunke.videochat.dialog.NotCameraDialog
+import com.vunke.videochat.login.UserInfoUtil
 import com.vunke.videochat.manage.BackgroundManage
+import com.vunke.videochat.manage.TalkManage
+import com.vunke.videochat.model.TalkBean
 import com.vunke.videochat.service.LinphoneMiniManager
 import com.vunke.videochat.tools.CallRecordUtil
 import com.vunke.videochat.tools.FocusUtil
 import com.vunke.videochat.tools.LinphoneMiniUtils
+import com.vunke.videochat.tools.TimeUtil
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.observers.DisposableObserver
@@ -141,6 +146,14 @@ class AudioActivity:AppCompatActivity(), View.OnClickListener{
                             callRecord.call_name = contactsList.get(0).user_name
                             audio_phone.setText(callRecord.call_name)
                         }
+                    }else{
+                        val remoteAddress = instance!!.getmLinphoneCore().remoteAddress
+                        Log.i(TAG, "initData: remoteAddress:$remoteAddress")
+                        val userName = remoteAddress.userName
+                        audio_phone.setText(userName)
+                        val getDisplayName = remoteAddress.displayName
+                        callRecord.call_phone = userName
+                        callRecord.call_name = getDisplayName
                     }
                 }
             }catch (e:Exception){
@@ -219,6 +232,21 @@ class AudioActivity:AppCompatActivity(), View.OnClickListener{
         if ( null!= dialog  && dialog!!.isShow()){
             dialog!!.cancel()
         }
+        var userInfoUtil = UserInfoUtil.getInstance(this)
+        val userId= userInfoUtil.getUserId()
+        var talkbean = TalkBean()
+        talkbean.userId=userId
+        talkbean.talkDuration= (System.currentTimeMillis()-firstCallTime!!)/1000
+        talkbean.talkTime = TimeUtil.getDateTime(TimeUtil.dateFormatYMDHMS,firstCallTime!!)
+        TalkManage.addConversationLog(talkbean,object:TalkCallBack{
+            override fun onSuccess() {
+
+            }
+
+            override fun OnFailed() {
+
+            }
+        })
     }
 
     inner class MainActivityReceiver : BroadcastReceiver() {

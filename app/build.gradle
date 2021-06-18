@@ -10,8 +10,8 @@ android {
         applicationId "com.vunke.videochat"
         minSdkVersion 19
         targetSdkVersion 26
-        versionCode 56
-        versionName "56.0"
+        versionCode 62
+        versionName "62.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

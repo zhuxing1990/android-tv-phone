@@ -27,6 +27,8 @@ import com.vunke.videochat.tools.CallRecordUtil;
 import com.vunke.videochat.ui.AudioActivity;
 import com.vunke.videochat.ui.VideoActivity;
 
+import org.linphone.core.LinphoneAddress;
+
 import java.util.List;
 
 /**
@@ -129,6 +131,13 @@ public class CallInDialog implements View.OnKeyListener {
                             callRecord.call_status = CallInfo.INSTANCE.getCALL_MISSED();
                             CallRecordUtil.updateCallRecord(context,callRecord);
                         }
+                    }else{
+                        LinphoneAddress remoteAddress = instance.getmLinphoneCore().getRemoteAddress();
+                        Log.i(TAG, "initData: remoteAddress:"+remoteAddress);
+                        String userName = remoteAddress.getUserName();
+                        String getDisplayName = remoteAddress.getDisplayName();
+                        callRecord.call_phone = userName;
+                        callRecord.call_name = getDisplayName;
                     }
                 }catch (Exception e){
                     e.printStackTrace();
@@ -163,6 +172,12 @@ public class CallInDialog implements View.OnKeyListener {
 //                }
                     String number = data[1].substring(0, data[1].indexOf(";"));
                     textView.setText(number);
+                }else{
+                    LinphoneAddress remoteAddress = instance.getmLinphoneCore().getRemoteAddress();
+                    Log.i(TAG, "initData: remoteAddress:"+remoteAddress);
+                    String userName = remoteAddress.getUserName();
+                    String getDisplayName = remoteAddress.getDisplayName();
+                    textView.setText(getDisplayName);
                 }
             }
         }catch (Exception e){

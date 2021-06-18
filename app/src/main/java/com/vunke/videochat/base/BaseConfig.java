@@ -6,6 +6,7 @@ package com.vunke.videochat.base;
 
 public class BaseConfig {
    public static final String  BASE_URL = "http://10.255.26.3:8083/VideoPhone/";//基础URL
+//   public static final String  BASE_URL = "http://10.255.26.3:8084/VideoPhone/";//基础URL
 //   public static final String  BASE_URL = "http://134.175.229.3:8083/VideoPhone/";//基础URL
 //   public static final String  BASE_URL = "http://124.232.136.236:8082/VideoPhone/";//test
     /**
@@ -16,8 +17,15 @@ public class BaseConfig {
     public static final String DEL_USER_CONTACTS = "addressDel.do";
     public static final String LOGIN = "login.do";
     public static final String GET_OPTIONAL_ACCOUNT ="oai/getOptionalAccount.do";
+
     public static final String FIXE_LINE_BINDING ="oai/fixedLineBinding.do";
+
     public static final String QUY_BY_CUSTOMER_DATA = "oai/qryByCustomerData.do";
+
+    public static final String ADD_CONVERSTION_LOG = "addConversationLog.do";
+
+    public static final String ADD_ACCESS_LOG = "addAccessLog.do";
+
     public static final  String ipaddr = "10.255.25.48";
     public static final  String port = "5060";
     public static final  String areaCode = "+86";

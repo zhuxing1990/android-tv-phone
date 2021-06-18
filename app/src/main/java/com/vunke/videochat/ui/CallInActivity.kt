@@ -40,8 +40,8 @@ class  CallInActivity :AppCompatActivity(), View.OnClickListener{
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_call_in)
         initLinstener()
-        initData()
         instance = LinphoneMiniManager.getInstance()
+        initData()
         registerBroad()
         call_in_answer.requestFocus()
     }
@@ -82,7 +82,6 @@ class  CallInActivity :AppCompatActivity(), View.OnClickListener{
             Log.i(TAG,"message:$message")
             try {
                 if (!TextUtils.isEmpty(message)){
-
                     if (message.contains("<tel")){
                         val data = message.split("<tel:")
 //                        for (i in data.indices) {
@@ -97,6 +96,14 @@ class  CallInActivity :AppCompatActivity(), View.OnClickListener{
                             callRecord.call_name = contactsList.get(0).user_name
                             audio_in_phone.setText(callRecord.call_name)
                         }
+                    } else {
+                        val remoteAddress = instance!!.getmLinphoneCore().remoteAddress
+                        Log.i(TAG, "initData: remoteAddress:$remoteAddress")
+                        val userName = remoteAddress.userName
+                        audio_in_phone.setText(userName)
+                        val getDisplayName = remoteAddress.displayName
+                        callRecord.call_phone = userName
+                        callRecord.call_name = getDisplayName
                     }
                 }
             }catch (e:Exception){

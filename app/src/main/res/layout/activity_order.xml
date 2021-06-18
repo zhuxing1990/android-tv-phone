@@ -41,6 +41,7 @@
             android:layout_below="@+id/order_product_rl"/>
 
         <RelativeLayout
+            android:id="@+id/order_userInfo_relative"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
@@ -52,18 +53,26 @@
                 android:textSize="24sp"
                 android:text="@string/open_des"/>
             <TextView
+                android:id="@+id/order_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="24sp"
+                android:text="@string/user_name"
+                android:layout_below="@id/order_open_des"/>
+            <TextView
                 android:id="@+id/order_username"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_toRightOf="@+id/order_open_des"
+                android:layout_toRightOf="@+id/order_name"
                 android:text="***"
                 android:textSize="24sp"
+                android:layout_below="@id/order_open_des"
                 android:textColor="@color/color_orange_1"/>
             <TextView
                 android:id="@+id/order_card_des"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_toRightOf="@+id/order_username"
+                android:layout_below="@+id/order_name"
                 android:textSize="24sp"
                 android:text="@string/card_des"/>
             <TextView
@@ -73,22 +82,36 @@
                 android:textColor="@color/color_orange_1"
                 android:text="****"
                 android:textSize="24sp"
+                android:layout_below="@+id/order_name"
                 android:layout_toRightOf="@+id/order_card_des"/>
+            <EditText
+                android:id="@+id/order_edit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="6dp"
+                android:layout_below="@+id/order_name"
+                android:ems="2"
+                android:inputType="text"
+                android:textSize="24sp"
+                android:textColor="@color/color_orange_1"
+                android:background="@color/color_white"
+                android:layout_toRightOf="@+id/order_usercard"
+                />
             <TextView
                 android:id="@+id/order_callrate_des"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_toRightOf="@+id/order_usercard"
-                android:textSize="24sp"
-                android:visibility="invisible"
-                android:text="@string/call_rate_des"/>
+                android:layout_toRightOf="@+id/order_edit"
+                android:textSize="20sp"
+                android:layout_below="@+id/order_name"
+                android:text="@string/input_user_card"/>
         </RelativeLayout>
     </RelativeLayout>
     <RelativeLayout
         android:id="@+id/order_usered_rl"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="80dp"
+        android:layout_marginTop="50dp"
         android:layout_marginLeft="200dp"
         android:layout_marginRight="200dp"
         android:layout_below="@+id/order_orderinfo_rl">

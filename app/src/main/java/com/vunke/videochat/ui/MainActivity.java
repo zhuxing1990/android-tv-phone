@@ -227,8 +227,10 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
 //            7354427957   rz4k6vYz
 //            String userName = "7352227923";
 //            String password = "UUAoe4OJ";
-            String userName = "7354427957";
-            String password = "rz4k6vYz";
+//            String userName = "7354427957";
+//            String password = "rz4k6vYz";
+            String userName = "73188302837";
+            String password = "cT6Oel3m";
             RegisterManage.Login(MainActivity.this,userName,password);
         }catch (Exception e){
             e.printStackTrace();

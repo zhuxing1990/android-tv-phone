@@ -28,6 +28,7 @@ import android.widget.Toast;
 import com.vunke.videochat.R;
 import com.vunke.videochat.base.BaseConfig;
 import com.vunke.videochat.callback.CallOverCallBack;
+import com.vunke.videochat.callback.TalkCallBack;
 import com.vunke.videochat.config.CallInfo;
 import com.vunke.videochat.dao.ContactsDao;
 import com.vunke.videochat.db.CallRecord;
@@ -35,12 +36,17 @@ import com.vunke.videochat.db.CallRecordTable;
 import com.vunke.videochat.db.Contacts;
 import com.vunke.videochat.dialog.CallTimeDialog;
 import com.vunke.videochat.dialog.NotCameraDialog;
+import com.vunke.videochat.login.UserInfoUtil;
+import com.vunke.videochat.manage.TalkManage;
+import com.vunke.videochat.model.TalkBean;
 import com.vunke.videochat.service.LinphoneMiniManager;
 import com.vunke.videochat.tools.AudioUtil;
 import com.vunke.videochat.tools.CallRecordUtil;
 import com.vunke.videochat.tools.CameraUtil;
 import com.vunke.videochat.tools.LinphoneMiniUtils;
+import com.vunke.videochat.tools.TimeUtil;
 
+import org.linphone.core.LinphoneAddress;
 import org.linphone.core.LinphoneCall;
 import org.linphone.core.LinphoneCore;
 import org.linphone.core.LinphoneCoreException;
@@ -48,7 +54,10 @@ import org.linphone.core.VideoSize;
 import org.linphone.mediastream.video.AndroidVideoWindowImpl;
 import org.linphone.mediastream.video.capture.hwconf.AndroidCameraConfiguration;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
@@ -71,7 +80,8 @@ public class VideoActivity extends AppCompatActivity implements View.OnClickList
 	private NotCameraDialog dialog;
 	private ImageView video_switch;
 	private RelativeLayout callvideo_rl1,callvideo_rl2;
-
+	private TextView video_callTime;
+	private long firstCallTime=0;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -80,6 +90,8 @@ public class VideoActivity extends AppCompatActivity implements View.OnClickList
 		initData();
 		initCamera();
 		init();
+		firstCallTime = System.currentTimeMillis();
+		startCallTimeTask();
 		initCallTime();
 //		resizePreview();
 		initAlphaAnimation1();
@@ -91,6 +103,47 @@ public class VideoActivity extends AppCompatActivity implements View.OnClickList
 		LinphoneMiniUtils.initEchoCancellation();
 	}
 
+	DisposableObserver<Long> timeOb=null;
+	private void startCallTimeTask() {
+		timeOb = new DisposableObserver<Long>(){
+			@Override
+			public void onNext(Long aLong) {
+				long callTime = System.currentTimeMillis() - firstCallTime;
+				String getTime = getDateTimes(callTime);
+				video_callTime.setText(getTime);
+			}
+
+			@Override
+			public void onError(Throwable e) {
+				dispose();
+			}
+
+			@Override
+			public void onComplete() {
+				dispose();
+
+			}
+
+		};
+		Observable.interval(0,1,TimeUnit.SECONDS)
+				.subscribeOn(Schedulers.io())
+				.observeOn(AndroidSchedulers.mainThread())
+				.subscribe(timeOb);
+
+	}
+	private void stopCallTimeTask() {
+		if (timeOb!=null){
+			if (!timeOb.isDisposed()){
+				timeOb.dispose();
+				timeOb=null;
+			}
+		}
+	}
+	private String  getDateTimes(Long time){
+		SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+		sdf.setTimeZone(TimeZone.getTimeZone("GMT00:00"));
+		return sdf.format(new Date(time));
+	}
 	private void initCamera() {
 		int numberOfCameras = Camera.getNumberOfCameras();
 		Log.i(TAG,"get camera number:"+numberOfCameras);
@@ -129,6 +182,13 @@ public class VideoActivity extends AppCompatActivity implements View.OnClickList
 						if (contactsList!=null&&contactsList.size()!=0){
 							callRecord.call_name = contactsList.get(0).getUser_name();
 						}
+					}else{
+						LinphoneAddress remoteAddress = instance.getmLinphoneCore().getRemoteAddress();
+						Log.i(TAG, "initData: remoteAddress:"+remoteAddress);
+						String userName = remoteAddress.getUserName();
+						String getDisplayName = remoteAddress.getDisplayName();
+						callRecord.call_phone = userName;
+						callRecord.call_name = getDisplayName;
 					}
 				}
 			}catch (Exception e){
@@ -158,6 +218,7 @@ public class VideoActivity extends AppCompatActivity implements View.OnClickList
 		mPreviewView.getHolder().setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 		video_hang_up = findViewById(R.id.video_hang_up);
 		video_mute= findViewById(R.id.video_mute);
+		video_callTime= findViewById(R.id.video_callTime);
 //		video_speaker = findViewById(R.id.video_speaker);
 		video_qiev =findViewById(R.id.video_qiev);
 		video_hang_up.setOnClickListener(this);
@@ -463,6 +524,25 @@ public class VideoActivity extends AppCompatActivity implements View.OnClickList
 			callTimeDialog.cancel();
 		}
 		clearCallTimeOut();
+		stopCallTimeTask();
+		UserInfoUtil userInfoUtil = UserInfoUtil.getInstance(this);
+		String userId= userInfoUtil.getUserId();
+		TalkBean talkbean = new TalkBean();
+		talkbean.setUserId(userId);
+		talkbean.setTalkDuration((System.currentTimeMillis()-firstCallTime)/1000);
+		talkbean.setTalkTime(TimeUtil.getDateTime(TimeUtil.dateFormatYMDHMS,firstCallTime)) ;
+		TalkManage.addConversationLog(talkbean,new TalkCallBack (){
+
+			@Override
+			public void onSuccess() {
+
+			}
+
+			@Override
+			public void OnFailed() {
+
+			}
+		});
 	}
 
 	private void clearCallTimeOut() {

@@ -9,12 +9,14 @@
         android:id="@+id/callvideo_rl1"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@mipmap/home_backgroud"
         android:clipToPadding="false"
         android:clipChildren="false">
         <org.linphone.mediastream.video.display.GL2JNIView
             android:id="@+id/id_video_rendering"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="@mipmap/home_backgroud"
             />
 
     </RelativeLayout>
@@ -33,7 +35,21 @@
             />
     </RelativeLayout>
 
-
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/color_black_66"
+        android:layout_above="@+id/call_video_r3">
+        <TextView
+            android:id="@+id/video_callTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="通话时间"
+            android:textColor="@android:color/white"
+            android:textSize="32sp"
+            android:layout_centerHorizontal="true"
+            />
+    </RelativeLayout>
     <RelativeLayout
         android:id="@+id/call_video_r3"
         android:layout_width="match_parent"
